@@ -1,0 +1,23 @@
+{
+  "name": "battlecards",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint"
+  },
+  "author": "abbeal",
+  "license": "ISC",
+  "dependencies": {
+    "turbo": "^1.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "npm@9.6.6"
+}
