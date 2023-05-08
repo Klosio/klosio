@@ -7,7 +7,7 @@ import { saveAs } from 'file-saver';
 import "./style.css";
 function IndexPopup() {
   function captureAudio() {
-    navigator.mediaDevices.getDisplayMedia({ audio: true, video: false })
+    navigator.mediaDevices.getDisplayMedia({ audio: true, video: true })
       .then((stream) => startRecording(stream))
       .catch(function(error) {
         alert('Unable to capture tab audio.');
@@ -16,44 +16,44 @@ function IndexPopup() {
   }
 
   function startRecording(stream: MediaStream) {
-    const test = new MediaRecorder(stream, { mimeType: 'audio/webm',  });
-    test.ondataavailable = ((e) => {
-      const file = new File([e.data], 'filename.webm', {
-        type: 'audio/webm'
-      });
-      console.log(file)
-      saveAs(file)
-    });
-    test.start(10000);
-
-    // const recorder = RecordRTC(stream, {
-    //   audio: true,
-    //   video: false,
-    //   gif: false,
-    //   type: 'audio',
-    //   mimeType: 'audio/webm',
-    //   timeSlice: 10000,
-    //   ondataavailable: (blob) => {
-    //     console.log('blob', blob);
-  
-    //     invokeSaveAsDialog(blob);
-        
-    //     const file = new File([blob], 'filename.webm', {
-    //         type: 'video/webm'
-    //     });
-  
-    //     var formData = new FormData();
-    //     formData.append('file', file); // upload "File" object rather than a "Blob"
-    //     // upload formadata to server using fetch
-    //     fetch('https://example.com/upload', {
-    //         method: 'POST',
-    //         body: formData
-    //     }).then(response => {
-    //         return response.json();
-    //     });
-    //   }
+    // const test = new MediaRecorder(stream, { mimeType: 'audio/webm',  });
+    // test.ondataavailable = ((e) => {
+    //   const file = new File([e.data], 'filename.webm', {
+    //     type: 'audio/webm'
+    //   });
+    //   console.log(file)
+    //   saveAs(file)
     // });
-    // recorder.startRecording();
+    // test.start(10000);
+
+    const recorder = RecordRTC(stream, {
+      audio: true,
+      video: false,
+      gif: false,
+      type: 'audio',
+      mimeType: 'audio/webm',
+      timeSlice: 10000,
+      ondataavailable: (blob) => {
+        console.log('blob', blob);
+  
+        invokeSaveAsDialog(blob);
+        
+        const file = new File([blob], 'filename.webm', {
+            type: 'video/webm'
+        });
+  
+        var formData = new FormData();
+        formData.append('file', file); // upload "File" object rather than a "Blob"
+        // upload formadata to server using fetch
+        fetch('http://localhost:3000/transcript', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            return response.json();
+        });
+      }
+    });
+    recorder.startRecording();
   }
 
   return (
