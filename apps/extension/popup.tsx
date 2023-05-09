@@ -1,8 +1,9 @@
 import { useEffect, useReducer } from "react"
  
-import RecordRTC, { StereoAudioRecorder, invokeSaveAsDialog } from 'recordrtc';
+import RecordRTC, { invokeSaveAsDialog } from 'recordrtc';
 
 import { saveAs } from 'file-saver';
+import { createFFmpeg } from '@ffmpeg/ffmpeg';
 
 import "./style.css";
 function IndexPopup() {
@@ -31,15 +32,17 @@ function IndexPopup() {
       video: false,
       gif: false,
       type: 'audio',
-      mimeType: 'audio/webm',
-      timeSlice: 10000,
+      recorderType: RecordRTC.StereoAudioRecorder, // force for all browsers
+      numberOfAudioChannels: 2,
+      mimeType: 'audio/wav',
+      timeSlice: 20000,
       ondataavailable: (blob) => {
-        console.log('blob', blob);
+        // console.log('blob', blob);
   
-        invokeSaveAsDialog(blob);
+        // invokeSaveAsDialog(blob);
         
-        const file = new File([blob], 'filename.webm', {
-            type: 'video/webm'
+        const file = new File([blob], 'filename.wav', {
+            type: 'audio/wav'
         });
   
         var formData = new FormData();
