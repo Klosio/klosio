@@ -19,7 +19,7 @@ To use the Speech-to-Text Sales Assistant Chrome Extension, follow these steps:
 4. Build the extension: `npm run dev`
 5. Open the Chrome browser and go to `chrome://extensions`.
 6. Enable the "Developer mode" option (usually located in the top right corner).
-7. Click on "Load unpacked" and select the `dist` directory within your project directory.
+7. Click on "Load unpacked" and select the extension in the `build` directory within your project directory.
 8. The extension should now be installed and ready to use.
 
 ## License
