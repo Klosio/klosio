@@ -9,11 +9,13 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "author": "abbeal",
   "license": "ISC",
   "dependencies": {
+    "prettier": "^2.8.8",
     "turbo": "^1.9.3"
   },
   "engines": {

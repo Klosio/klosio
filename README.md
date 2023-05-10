@@ -4,10 +4,10 @@ This is a Chrome extension developed using TypeScript that aims to assist commer
 
 ## Features
 
-- Speech-to-text conversion: The extension utilizes AI-powered speech recognition capabilities to convert spoken conversations into written text.
-- Conversation analysis: It analyzes the customer exchange, identifying pain points and areas of interest to understand the customer's needs better.
-- Persuasive recommendations: Based on the analysis, the extension suggests effective strategies to convince the customer that our product can resolve their pain points.
-- Turbo-powered monorepo: The project utilizes Turbo, a toolkit for developing, building, and managing TypeScript monorepos. This helps to streamline development and deployment processes.
+-   Speech-to-text conversion: The extension utilizes AI-powered speech recognition capabilities to convert spoken conversations into written text.
+-   Conversation analysis: It analyzes the customer exchange, identifying pain points and areas of interest to understand the customer's needs better.
+-   Persuasive recommendations: Based on the analysis, the extension suggests effective strategies to convince the customer that our product can resolve their pain points.
+-   Turbo-powered monorepo: The project utilizes Turbo, a toolkit for developing, building, and managing TypeScript monorepos. This helps to streamline development and deployment processes.
 
 ## Installation
 
