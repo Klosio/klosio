@@ -1,6 +1,6 @@
 import { createFFmpeg } from "@ffmpeg/ffmpeg"
 import { saveAs } from "file-saver"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import RecordRTC, { invokeSaveAsDialog } from "recordrtc"
 
 import "./style.css"
@@ -54,10 +54,10 @@ function IndexPopup() {
                 })
 
                 var formData = new FormData()
-                formData.append("file", file) // upload "File" object rather than a "Blob"
-                // upload formadata to server using fetch
+                formData.append("file", file)
+
                 const newTranscript = await fetch(
-                    "http://localhost:3000/transcript",
+                    process.env.PLASMO_PUBLIC_SERVER_URL + "/transcript",
                     {
                         method: "POST",
                         body: formData
