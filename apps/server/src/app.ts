@@ -13,8 +13,8 @@ require('dotenv').config();
 
 const app = express();
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const storage = getEnvVar('NODE_ENV') === 'development' ? { dest: 'uploads/' } : { storage: multer.memoryStorage()};
+const upload = multer(storage);
 
 const deepgram_api_key = getEnvVar('DEEPGRAM_API_KEY');
 
