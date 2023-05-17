@@ -1,9 +1,9 @@
 {
   "name": "example-dir",
-  "displayName": "Example dir",
+  "displayName": "Battlecards AI",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
-  "author": "corentinleberre",
+  "description": "Chrome extension that aims to assist commercial professionals, in improving their sales skills",
+  "author": "abbeal",
   "packageManager": "npm@9.5.1",
   "scripts": {
     "dev": "plasmo dev",
