@@ -3,6 +3,8 @@ import RecordRTC, { invokeSaveAsDialog } from "recordrtc"
 
 import "../style.css"
 
+import("preline")
+
 function Record() {
     const [transcript, setTranscript] = useState<string>("")
     const [globalRecorder, setGlobalRecorder] = useState<RecordRTC | null>(null)
