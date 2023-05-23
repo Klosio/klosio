@@ -15,7 +15,7 @@
     "file-saver": "^2.0.5",
     "formik": "^2.2.9",
     "inline-worker": "^1.1.0",
-    "plasmo": "0.69.3",
+    "plasmo": "^0.72.2",
     "preline": "^1.8.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
