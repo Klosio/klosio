@@ -4,6 +4,7 @@ module.exports = {
     darkMode: "media",
     content: ['node_modules/preline/dist/*.js', "./**/*.tsx"],
     plugins: [
-        require('preline/plugin'),
+        require('@tailwindcss/forms'),
+        require('preline/plugin')
     ]
 }

@@ -11,16 +11,19 @@
     "package": "plasmo package"
   },
   "dependencies": {
+    "@plasmohq/storage": "^1.6.0",
     "file-saver": "^2.0.5",
+    "formik": "^2.2.9",
     "inline-worker": "^1.1.0",
     "plasmo": "0.69.3",
+    "preline": "^1.8.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "recordrtc": "^5.6.2",
-    "preline": "^1.8.0"
+    "recordrtc": "^5.6.2"
   },
   "devDependencies": {
     "@plasmohq/prettier-plugin-sort-imports": "3.6.4",
+    "@tailwindcss/forms": "^0.5.3",
     "@types/chrome": "0.0.227",
     "@types/file-saver": "^2.0.5",
     "@types/node": "18.16.3",

@@ -1,40 +1,37 @@
+import { useEffect, useState } from "react"
+
 import "./style.css"
+
+import Landing from "~components/landing"
+import Logged from "~components/logged"
+import type User from "~types/user"
 
 import("preline")
 
 function IndexPopup() {
+    const [user, setUser] = useState<User>()
 
-    const user = { name: "Christophe Dupont"}
+    useEffect(() => {
+        // Get user state from storage
+        setUser({ name: "Christophe Dupont" })
+    }, [])
 
-    async function openTab() {
-        await chrome.tabs.create({
-            url: "./tabs/record.html"
-        })
+    function logout(): void {
+        setUser(null)
+    }
+
+    function login(): void {
+        setUser({ name: "Christophe Dupont" })
     }
 
     return (
-        <div className="m-2 w-[250px] flex flex-col space-y-2">
-            <h1 className="text-lg text-center font-bold text-gray-800 dark:text-white">Battlecards AI Companion</h1>
-            <h1 className="text-sm text-center font-semi-bold text-gray-700 dark:text-white">Connected as {user.name}</h1>
-            <button
-                onClick={openTab}
-                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                Start a meeting
-            </button>
-            <button
-                onClick={() => {
-                    alert("Not implemented yet")
-                }}
-                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-green-100 border border-transparent font-semibold text-green-500 hover:text-white hover:bg-green-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-green-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                Import Battlecards
-            </button>
-            <button
-                onClick={() => {
-                    alert("Not implemented yet")
-                }}
-                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-yellow-100 border border-transparent font-semibold text-yellow-500 hover:text-white hover:bg-yellow-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-yellow-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                Logout
-            </button>
+        <div className="m-2 w-[300px] space-y-2 flex flex-col bg-white border shadow-sm rounded-xl p-4 md:p-5">
+            <div className="border-b border-gray-200">
+                <h1 className="text-lg text-center font-bold text-gray-80">
+                    Battlecards AI Companion
+                </h1>
+            </div>
+            {user ? <Logged {...{ user, logout }} /> : <Landing />}
         </div>
     )
 }
