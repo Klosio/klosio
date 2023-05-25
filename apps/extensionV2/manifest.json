@@ -1,0 +1,25 @@
+{
+    "name": "Audio Transcript",
+    "description": "A minimal Chrome extension for audio transcription.",
+    "version": "1.0",
+    "icons": {
+        "128": "icon.png"
+    },
+    "manifest_version": 3,
+    "web_accessible_resources": [{
+        "matches": ["<all_urls>"],
+        "resources": ["RecordRTC.js"]
+    }],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "activeTab",
+        "tabs",
+        "tabCapture",
+        "storage",
+        "scripting",
+        "webRequest",
+        "webNavigation"
+    ]
+}
