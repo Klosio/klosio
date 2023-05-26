@@ -23,12 +23,13 @@ async function addContentScript(tab) {
     }
 }
 
-async function startRecording() {
+async function startRecording(language: string) {
     console.log("Send message to start recording...")
     const tab = await getCurrentTab()
     await addContentScript(tab)
     const response = await chrome.tabs.sendMessage(tab.id, {
-        recording: "start"
+        recording: "start",
+        language
     })
     console.log("Message sent.")
     if (response.recordingStarted === true) {
@@ -55,14 +56,6 @@ async function getCurrentTab() {
     })
     console.log(`current tab ${tab.id}`)
     return tab
-}
-
-function getStartButton() {
-    return document.getElementById("start")
-}
-
-function getStopButton() {
-    return document.getElementById("stop")
 }
 
 async function isContentScriptReady() {

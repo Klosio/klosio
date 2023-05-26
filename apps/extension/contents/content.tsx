@@ -7,11 +7,11 @@ export const config: PlasmoCSConfig = {
 }
 
 const CustomButton = () => {
-    let [isRecording, setIsRecording] = useState(false)
-    let [fullTranscript, setFullTranscript] = useState("")
-    let [globalRecorder, setGlobalRecorder] = useState(null)
+    const [isRecording, setIsRecording] = useState(false)
+    const [fullTranscript, setFullTranscript] = useState("")
+    const [globalRecorder, setGlobalRecorder] = useState(null)
 
-    chrome.runtime.onMessage.addListener(function (
+    chrome.runtime.onMessage.addListener(async function (
         request,
         sender,
         sendResponse
@@ -23,8 +23,8 @@ const CustomButton = () => {
             sendResponse({ contentScriptRecording: isRecording })
         }
         if (request.recording === "start") {
-            console.log("Recording started...")
-            ;(async () => await startRecording())()
+            console.log("Recording started in", request.language)
+            await startRecording(request.language)
             setIsRecording(true)
             sendResponse({ recordingStarted: true })
         }
@@ -36,7 +36,7 @@ const CustomButton = () => {
         }
     })
 
-    async function startRecording() {
+    async function startRecording(language: string) {
         console.log("Start recording...")
         const audioContext = new AudioContext()
         const displayMediaStream = await navigator.mediaDevices.getDisplayMedia(
@@ -63,10 +63,10 @@ const CustomButton = () => {
         const mediaDest = audioContext.createMediaStreamDestination()
         audioDisplayMedia.connect(mediaDest)
         audioUserMedia.connect(mediaDest)
-        startAudioRecorder(mediaDest.stream)
+        startAudioRecorder(mediaDest.stream, language)
     }
 
-    function startAudioRecorder(stream) {
+    function startAudioRecorder(stream, language: string) {
         const audioRecorder = new RecordRTC(stream, {
             type: "audio",
             mimeType: "audio/wav",
@@ -78,20 +78,23 @@ const CustomButton = () => {
                 const file = new File([blob], "filename.wav", {
                     type: "audio/wav"
                 })
-                const transcript = await getTranscriptFromAudioFile(file)
+                const transcript = await getTranscriptFromAudioFile(
+                    file,
+                    language
+                )
                 console.log(transcript)
                 addTranscript(transcript)
             }
         })
         audioRecorder.startRecording()
-        setGlobalRecorder = audioRecorder
+        setGlobalRecorder(audioRecorder)
         addTranscript("start")
     }
 
     function stopRecording() {
         console.log("Stop recording...")
         globalRecorder?.stopRecording(() => {})
-        globalRecorder = null
+        setGlobalRecorder(null)
         console.log(fullTranscript)
     }
 
@@ -99,13 +102,16 @@ const CustomButton = () => {
         setFullTranscript((fullTranscript) => `${fullTranscript} ${transcript}`)
     }
 
-    async function getTranscriptFromAudioFile(file) {
+    async function getTranscriptFromAudioFile(file, language: string) {
         const formData = new FormData()
         formData.append("file", file)
-        const newTranscript = await fetch("http://localhost:3000/transcript", {
-            method: "POST",
-            body: formData
-        })
+        const newTranscript = await fetch(
+            `http://localhost:3000/transcript/${language}`,
+            {
+                method: "POST",
+                body: formData
+            }
+        )
             .then((response) => response.json())
             .then((responseJson) => responseJson.transcript)
         return newTranscript
