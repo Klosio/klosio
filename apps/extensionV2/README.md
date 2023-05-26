@@ -9,10 +9,11 @@ Being able to transcript audio from a browser tab and the mic and display the tr
 ## Installation
 
 To install the extension:
+
 1. Open the Chrome browser and go to `chrome://extensions`.
 2. Enable the "Developer mode" option (usually located in the top right corner).
 3. Click on "Load unpacked" and select this `extensionV2` folder.
-8. The extension should now be installed and ready to use.
+4. The extension should now be installed and ready to use.
 
 ## Usage
 

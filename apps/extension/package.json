@@ -48,7 +48,8 @@
       "desktopCapture",
       "audioCapture",
       "videoCapture",
-      "storage"
+      "storage",
+      "scripting"
     ]
   }
 }

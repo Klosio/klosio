@@ -2,23 +2,21 @@ import type User from "~types/user"
 
 interface LoggedProps {
     user: User
+    allowRecording: boolean
+    startRecording: VoidFunction
     logout: VoidFunction
 }
 
 function Logged(props: LoggedProps) {
-    const startMeeting = async () =>
-        await chrome.tabs.create({
-            url: "./tabs/record.html"
-        })
-
     return (
         <div className="m-2 flex flex-col space-y-2">
             <h1 className="text-sm text-center font-semi-bold text-gray-700 dark:text-white">
                 Connected as {props.user.name}
             </h1>
             <button
-                onClick={startMeeting}
-                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                onClick={props.startRecording}
+                disabled={!props.allowRecording}
+                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold disabled:cursor-not-allowed disabled:bg-green-400 bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                 Start a meeting
             </button>
             <button
