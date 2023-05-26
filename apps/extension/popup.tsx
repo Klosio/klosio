@@ -8,13 +8,111 @@ import type User from "~types/user"
 
 import("preline")
 
+async function addContentScript(tab) {
+    if (await isContentScriptReady()) {
+        return
+    }
+    console.log("Add content script...", tab.id)
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["../contents/content.tsx"]
+    })
+    while (!(await isContentScriptReady())) {
+        console.log("Waiting for content script to be ready...")
+        await timeout(200)
+    }
+}
+
+async function startRecording() {
+    console.log("Send message to start recording...")
+    const tab = await getCurrentTab()
+    await addContentScript(tab)
+    const response = await chrome.tabs.sendMessage(tab.id, {
+        recording: "start"
+    })
+    console.log("Message sent.")
+    if (response.recordingStarted === true) {
+        console.log("Started recording.")
+    }
+}
+
+async function stopRecording() {
+    console.log("Send message to stop recording...")
+    const tab = await getCurrentTab()
+    const response = await chrome.tabs.sendMessage(tab.id, {
+        recording: "stop"
+    })
+    console.log("Message sent.")
+    if (response.recordingStopped === true) {
+        console.log("Stopped recording.")
+    }
+}
+
+async function getCurrentTab() {
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        lastFocusedWindow: true
+    })
+    console.log(`current tab ${tab.id}`)
+    return tab
+}
+
+function getStartButton() {
+    return document.getElementById("start")
+}
+
+function getStopButton() {
+    return document.getElementById("stop")
+}
+
+async function isContentScriptReady() {
+    try {
+        const tab = await getCurrentTab()
+        const response = await chrome.tabs.sendMessage(tab.id, {
+            script: "status"
+        })
+        if (response.contentScriptReady === true) {
+            return true
+        }
+    } catch {
+        return false
+    }
+    return false
+}
+
+async function isRecording() {
+    try {
+        const tab = await getCurrentTab()
+        const response = await chrome.tabs.sendMessage(tab.id, {
+            script: "recording"
+        })
+        if (response.contentScriptRecording === true) {
+            return true
+        }
+    } catch {
+        return false
+    }
+    return false
+}
+
+function timeout(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 function IndexPopup() {
     const [user, setUser] = useState<User>()
+    const [currentTab, setCurrentTab] = useState(null)
 
     useEffect(() => {
         // Get user state from storage
         setUser({ name: "Christophe Dupont" })
+        getCurrentTab().then((t) => setCurrentTab(t))
     }, [])
+
+    function detectGoogleMeetURL(url: string): boolean {
+        const regex = /https:\/\/meet\.google\.com\//
+        return regex.test(url)
+    }
 
     function logout(): void {
         setUser(null)
@@ -31,7 +129,18 @@ function IndexPopup() {
                     Battlecards AI Companion
                 </h1>
             </div>
-            {user ? <Logged {...{ user, logout }} /> : <Landing />}
+            {user ? (
+                <Logged
+                    {...{
+                        user,
+                        allowRecording: detectGoogleMeetURL(currentTab?.url),
+                        startRecording,
+                        logout
+                    }}
+                />
+            ) : (
+                <Landing />
+            )}
         </div>
     )
 }
