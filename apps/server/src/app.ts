@@ -2,6 +2,7 @@ import MessageResponse from './interfaces/MessageResponse';
 import type TranscriptResponse from './interfaces/TranscriptReponse';
 import * as middlewares from './middlewares';
 import getEnvVar from './util/env';
+import supportedLanguages from './util/supportedLanguages';
 import { Deepgram } from '@deepgram/sdk';
 import cors from 'cors';
 import express from 'express';
@@ -32,10 +33,18 @@ app.get<{}, MessageResponse>('/health', (_, res) =>
     })
 );
 
-app.post<{}, TranscriptResponse | MessageResponse>(
-    '/transcript',
+app.post<{ language: string }, TranscriptResponse | MessageResponse>(
+    '/transcript/:language',
     upload.single('file'),
     async (req, res) => {
+        if (
+            !req.params.language ||
+            !supportedLanguages.has(req.params.language)
+        ) {
+            res.status(400).json({
+                message: 'No language specified in request params',
+            });
+        }
         if (req.file) {
             const buffer = req.file.buffer;
 
@@ -44,25 +53,34 @@ app.post<{}, TranscriptResponse | MessageResponse>(
             deepgram.transcription
                 .preRecorded(
                     { buffer, mimetype: 'audio/wav' },
-                    { punctuate: true, model: 'enhanced', language: 'fr' }
+                    {
+                        punctuate: true,
+                        model: 'enhanced',
+                        language: supportedLanguages.get(req.params.language),
+                    }
                 )
                 .then((response) => {
                     const transcript =
                         response.results?.channels[0]?.alternatives[0]
                             ?.transcript;
                     if (!transcript) {
-                        res.status(400).json({ message: 'No transcript' });
-                        return;
+                        res.status(400).json({
+                            message: 'No transcript returned by the API',
+                        });
                     } else {
                         res.status(200).json({ transcript });
                     }
                 })
                 .catch((err) => {
                     console.log(err);
-                    res.status(400).json({ message: 'Error' });
+                    res.status(400).json({
+                        message: 'Error when calling the API',
+                    });
                 });
         } else {
-            res.status(400).json({ message: 'No file uploaded' });
+            res.status(400).json({
+                message: 'No audio file provided in the request',
+            });
         }
     }
 );

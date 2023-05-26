@@ -56,7 +56,7 @@ function Record() {
                 formData.append("file", file)
 
                 const newTranscript = await fetch(
-                    "http://localhost:3000/transcript",
+                    `http://localhost:3000/transcript/${language}`,
                     {
                         method: "POST",
                         body: formData
