@@ -55,52 +55,46 @@ const deepgramAnalysis = async (
 async function PostAnalysisRequestHandler(
     req: Request<{ language: string }>,
     res: Response,
-    _next: NextFunction
+    next: NextFunction
 ) {
     if (!req.params.language || !supportedLanguages.has(req.params.language)) {
-        res.status(400).json({
-            message: "No language specified in request params"
-        })
+        res.status(400)
+        return next(new Error("No language specified in request params"))
     }
     if (!req.file) {
-        res.status(400).json({
-            message: "No audio file provided in the request"
-        })
-    } else {
-        const deepgramResult = await deepgramAnalysis(
-            req.file.buffer,
-            req.params.language
-        ).catch((err) => {
-            console.log(err)
-            res.status(400).json({
-                message: "Error when calling the API"
-            })
-        })
-
-        if (!deepgramResult)
-            return res
-                .status(400)
-                .json({ message: "No transcript returned by the API" })
-
-        const gptresult = await gptAnalysis(role, deepgramResult).catch(
-            (err) => {
-                console.log(err)
-                res.status(400).json({
-                    message: "Error when calling the API"
-                })
-            }
-        )
-
-        if (!gptresult)
-            return res
-                .status(400)
-                .json({ message: "No result returned by the API" })
-
-        res.status(200).json({
-            transcript: deepgramResult,
-            result: gptresult
-        })
+        res.status(400)
+        return next(new Error("No audio file provided in the request"))
     }
+
+    const deepgramResult = await deepgramAnalysis(
+        req.file.buffer,
+        req.params.language
+    ).catch((err) => {
+        console.log(err)
+        res.status(400)
+        return next(new Error("Error when calling the transcription API"))
+    })
+
+    if (!deepgramResult) {
+        res.status(400)
+        return next(new Error("No transcript returned by the API"))
+    }
+
+    const gptresult = await gptAnalysis(role, deepgramResult).catch((err) => {
+        console.log(err)
+        res.status(400)
+        return next(new Error("Error when calling the ml API"))
+    })
+
+    if (!gptresult) {
+        res.status(400)
+        return next(new Error("No result returned by the ml API"))
+    }
+
+    return res.status(200).json({
+        painpoint: deepgramResult,
+        analysis: gptresult
+    })
 }
 
 export default PostAnalysisRequestHandler

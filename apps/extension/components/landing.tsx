@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import Login from "./login"
+import Login from "./Login"
 
 interface LandingProps {}
 
