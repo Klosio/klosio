@@ -1,9 +1,9 @@
 function getEnvVar(name: string): string {
-    const value = process.env[name];
+    const value = process.env[name]
     if (!value) {
-        throw new Error(`Missing env var: ${name}`);
+        throw new Error(`Missing env var: ${name}`)
     }
-    return value;
+    return value
 }
 
-export default getEnvVar;
+export default getEnvVar

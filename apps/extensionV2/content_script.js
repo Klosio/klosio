@@ -92,7 +92,7 @@ function addTranscript(transcript) {
 async function getTranscriptFromAudioFile(file) {
     const formData = new FormData();
     formData.append('file', file);
-    const newTranscript = await fetch('http://localhost:3000/transcript', {
+    const newTranscript = await fetch('http://localhost:3000/analysis', {
         method: 'POST',
         body: formData,
     })
