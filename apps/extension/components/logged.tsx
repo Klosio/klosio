@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import type User from "~types/user"
+import type User from "~types/user.model"
 
 import LanguageSelection from "./LanguageSelection"
 

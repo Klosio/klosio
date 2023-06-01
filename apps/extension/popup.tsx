@@ -2,9 +2,9 @@ import { useEffect, useState } from "react"
 
 import "./style.css"
 
-import Landing from "~components/landing"
-import Logged from "~components/logged"
-import type User from "~types/user"
+import Landing from "~components/Landing"
+import Logged from "~components/Logged"
+import type User from "~types/user.model"
 
 import("preline")
 

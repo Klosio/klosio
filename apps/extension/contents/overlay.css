@@ -1,0 +1,7 @@
+.plasmo-csui-container {
+    position: fixed !important;
+    top: unset !important;
+    left: unset !important;
+    right: 10px !important;
+    bottom: 10px !important;
+}
