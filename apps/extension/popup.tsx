@@ -4,11 +4,11 @@ import "./style.css"
 
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 
-import Landing from "~components/Landing"
 import LanguageSelection from "~components/LanguageSelection"
-import Login from "~components/Login"
 import Menu from "~components/Menu"
 import OrganizationCreation from "~components/OrganizationCreation"
+import Landing from "~components/landing"
+import Login from "~components/login"
 import type Organization from "~types/organization.model"
 import type User from "~types/user.model"
 
