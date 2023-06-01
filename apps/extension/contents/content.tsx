@@ -106,7 +106,7 @@ const CustomButton = () => {
         const formData = new FormData()
         formData.append("file", file)
         const newTranscript = await fetch(
-            `http://localhost:3000/transcript/${language}`,
+            `http://localhost:3000/api/v1/analysis/${language}`,
             {
                 method: "POST",
                 body: formData
