@@ -2,9 +2,13 @@ import { useEffect, useState } from "react"
 
 import "./style.css"
 
-import Landing from "~components/Landing"
-import Logged from "~components/Logged"
+import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
+
+import LanguageSelection from "~components/LanguageSelection"
 import type User from "~types/user.model"
+import Landing from "~components/landing"
+import Login from "~components/login"
+import Menu from "~components/Menu"
 
 import("preline")
 
@@ -24,7 +28,7 @@ async function addContentScript(tab) {
 }
 
 async function startRecording(language: string) {
-    console.log("Send message to start recording...")
+    console.log("Send message to start recording...", language)
     const tab = await getCurrentTab()
     await addContentScript(tab)
     const response = await chrome.tabs.sendMessage(tab.id, {
@@ -116,25 +120,42 @@ function IndexPopup() {
     }
 
     return (
-        <div className="m-2 w-[300px] space-y-2 flex flex-col bg-white border shadow-sm rounded-xl p-4 md:p-5">
-            <div className="border-b border-gray-200">
-                <h1 className="text-lg text-center font-bold text-gray-80">
-                    Battlecards AI Companion
-                </h1>
+        <MemoryRouter>
+            <div className="m-2 w-[300px] space-y-2 flex flex-col bg-white border shadow-sm rounded-xl p-4 md:p-5">
+                <div className="border-b border-gray-200">
+                    <h1 className="text-lg text-center font-bold text-gray-80">
+                        Battlecards AI Companion
+                    </h1>
+                    <Link to={".."}>back</Link>
+                </div>
+                <div>
+                    <Routes>
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route
+                            path="/menu"
+                            element={
+                                <Menu
+                                    {...{
+                                        user,
+                                        allowRecording: detectGoogleMeetURL(
+                                            currentTab?.url
+                                        ),
+                                        logout
+                                    }}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/startMeeting"
+                            element={
+                                <LanguageSelection {...{ startRecording }} />
+                            }
+                        />
+                    </Routes>
+                </div>
             </div>
-            {user ? (
-                <Logged
-                    {...{
-                        user,
-                        allowRecording: detectGoogleMeetURL(currentTab?.url),
-                        startRecording,
-                        logout
-                    }}
-                />
-            ) : (
-                <Landing />
-            )}
-        </div>
+        </MemoryRouter>
     )
 }
 
