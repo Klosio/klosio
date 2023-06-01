@@ -1,4 +1,5 @@
 import { Field, Form, Formik } from "formik"
+import { useNavigate } from "react-router-dom"
 
 interface LoginProps {}
 
@@ -11,7 +12,10 @@ interface LoginForm {
 function Login(props: LoginProps) {
     const submit = (form: LoginForm) => {
         alert(JSON.stringify(form, null, 2))
+        navigate("/menu")
     }
+
+    const navigate = useNavigate()
 
     return (
         <>

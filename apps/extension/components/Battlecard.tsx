@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react"
-
 import type Battlecard from "~types/battlecard.model"
 
 interface BattlecardProps {
