@@ -11,6 +11,7 @@ import Landing from "~components/landing"
 import Login from "~components/login"
 import type Organization from "~types/organization.model"
 import type User from "~types/user.model"
+import ProvideContext from "~components/ProvideContext"
 
 import("preline")
 
@@ -162,6 +163,12 @@ function IndexPopup() {
                             <Route
                                 path="/createOrganization"
                                 element={<OrganizationCreation />}
+                            />
+                            <Route
+                                path="/provideContext"
+                                element={
+                                    <ProvideContext />
+                                }
                             />
                         </Routes>
                     </div>
