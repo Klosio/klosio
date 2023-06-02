@@ -4,11 +4,13 @@ import "./style.css"
 
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 
+import Landing from "~components/Landing"
 import LanguageSelection from "~components/LanguageSelection"
-import type User from "~types/user.model"
-import Landing from "~components/landing"
-import Login from "~components/login"
+import Login from "~components/Login"
 import Menu from "~components/Menu"
+import OrganizationCreation from "~components/OrganizationCreation"
+import type Organization from "~types/organization.model"
+import type User from "~types/user.model"
 
 import("preline")
 
@@ -98,6 +100,7 @@ function timeout(ms) {
 
 function IndexPopup() {
     const [user, setUser] = useState<User>()
+    const [organization, setOrganization] = useState<Organization>()
     const [currentTab, setCurrentTab] = useState(null)
 
     useEffect(() => {
@@ -120,42 +123,55 @@ function IndexPopup() {
     }
 
     return (
-        <MemoryRouter>
-            <div className="m-2 w-[300px] space-y-2 flex flex-col bg-white border shadow-sm rounded-xl p-4 md:p-5">
-                <div className="border-b border-gray-200">
-                    <h1 className="text-lg text-center font-bold text-gray-80">
-                        Battlecards AI Companion
-                    </h1>
-                    <Link to={".."}>back</Link>
+        <>
+            <MemoryRouter>
+                <div className="m-2 w-[300px] space-y-2 flex flex-col bg-white border shadow-sm rounded-xl p-4 md:p-5">
+                    <div className="border-b border-gray-200">
+                        <h1 className="text-lg text-center font-bold text-gray-80">
+                            Battlecards AI Companion
+                        </h1>
+                        <Link to={".."}>back</Link>
+                    </div>
+                    <div>
+                        <Routes>
+                            <Route path="/" element={<Landing />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route
+                                path="/menu"
+                                element={
+                                    <Menu
+                                        {...{
+                                            user,
+                                            organization,
+                                            allowRecording: detectGoogleMeetURL(
+                                                currentTab?.url
+                                            ),
+                                            logout
+                                        }}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/startMeeting"
+                                element={
+                                    <LanguageSelection
+                                        {...{ startRecording }}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/createOrganization"
+                                element={<OrganizationCreation />}
+                            />
+                        </Routes>
+                    </div>
                 </div>
-                <div>
-                    <Routes>
-                        <Route path="/" element={<Landing />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route
-                            path="/menu"
-                            element={
-                                <Menu
-                                    {...{
-                                        user,
-                                        allowRecording: detectGoogleMeetURL(
-                                            currentTab?.url
-                                        ),
-                                        logout
-                                    }}
-                                />
-                            }
-                        />
-                        <Route
-                            path="/startMeeting"
-                            element={
-                                <LanguageSelection {...{ startRecording }} />
-                            }
-                        />
-                    </Routes>
-                </div>
-            </div>
-        </MemoryRouter>
+            </MemoryRouter>
+            <script
+                src="https://accounts.google.com/gsi/client"
+                async
+                defer></script>
+        </>
     )
 }
 
