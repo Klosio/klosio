@@ -51,9 +51,6 @@
       "videoCapture",
       "storage",
       "scripting"
-    ],
-    "content_security_policy": {
-      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; https://apis.google.com; https://www.gstatic.com; https://www.googleapis.com; https://securetoken.googleapis.com;"
-    }
+    ]
   }
 }

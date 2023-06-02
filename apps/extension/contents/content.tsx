@@ -9,6 +9,8 @@ import type Battlecard from "~types/battlecard.model"
 
 import("preline")
 
+const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
+
 export const config: PlasmoCSConfig = {
     matches: ["https://meet.google.com/*"]
 }
@@ -120,7 +122,7 @@ const CustomButton = () => {
         const formData = new FormData()
         formData.append("file", file)
         const newTranscript: Battlecard = await fetch(
-            `http://localhost:3000/api/v1/analysis/${language}`,
+            `${serverUri}/api/v1/analysis/${language}`,
             {
                 method: "POST",
                 body: formData

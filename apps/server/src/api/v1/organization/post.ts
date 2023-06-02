@@ -10,7 +10,6 @@ async function PostOrganizationRequestHandler(
         res.status(400)
         return next(new Error("No name specified in body params"))
     }
-
     const organization = new Organization({
         name: req.body.name
     })
@@ -23,7 +22,7 @@ async function PostOrganizationRequestHandler(
             new Error(`Error when saving organization ${organization.name}`)
         )
     }
-    return res.status(204)
+    return res.sendStatus(204)
 }
 
 export default PostOrganizationRequestHandler

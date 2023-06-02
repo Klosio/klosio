@@ -4,14 +4,14 @@ import "./style.css"
 
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 
+import Landing from "~components/Landing"
 import LanguageSelection from "~components/LanguageSelection"
+import Login from "~components/Login"
 import Menu from "~components/Menu"
 import OrganizationCreation from "~components/OrganizationCreation"
-import Landing from "~components/landing"
-import Login from "~components/login"
+import ProvideContext from "~components/ProvideContext"
 import type Organization from "~types/organization.model"
 import type User from "~types/user.model"
-import ProvideContext from "~components/ProvideContext"
 
 import("preline")
 
@@ -110,6 +110,10 @@ function IndexPopup() {
         getCurrentTab().then((t) => setCurrentTab(t))
     }, [])
 
+    function updateOrganization(organization: Organization) {
+        setOrganization(organization)
+    }
+
     function detectGoogleMeetURL(url: string): boolean {
         const regex = /https:\/\/meet\.google\.com\//
         return regex.test(url)
@@ -119,8 +123,8 @@ function IndexPopup() {
         setUser(null)
     }
 
-    function login(): void {
-        setUser({ name: "Christophe Dupont" })
+    function login(user: User): void {
+        setUser(user)
     }
 
     return (
@@ -136,7 +140,10 @@ function IndexPopup() {
                     <div>
                         <Routes>
                             <Route path="/" element={<Landing />} />
-                            <Route path="/login" element={<Login />} />
+                            <Route
+                                path="/login"
+                                element={<Login onSuccess={login} />}
+                            />
                             <Route
                                 path="/menu"
                                 element={
@@ -162,13 +169,15 @@ function IndexPopup() {
                             />
                             <Route
                                 path="/createOrganization"
-                                element={<OrganizationCreation />}
+                                element={
+                                    <OrganizationCreation
+                                        onSuccess={updateOrganization}
+                                    />
+                                }
                             />
                             <Route
                                 path="/provideContext"
-                                element={
-                                    <ProvideContext />
-                                }
+                                element={<ProvideContext />}
                             />
                         </Routes>
                     </div>

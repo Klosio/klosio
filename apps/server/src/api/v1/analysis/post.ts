@@ -1,3 +1,4 @@
+import Option from "../../../model/Option"
 import getEnvVar from "../../../util/env"
 import supportedLanguages from "../../../util/supportedLanguages"
 import { Deepgram } from "@deepgram/sdk"
@@ -9,9 +10,6 @@ dotenv.config()
 
 const deepgram_api_key = getEnvVar("DEEPGRAM_API_KEY")
 const openai_api_key = getEnvVar("OPENAI_API_KEY")
-
-const role =
-    "En tant que vendeur dans l'industrie SAAS. Résume le contenu de la transcription de l'appel ci-dessus en mettant l'accent sur le problème ressenti par le client potentiel. La transcription du commercial et du client sont melanges. Il faut donc bien faire attention a ce que le resumé soit coherent."
 
 const gptAnalysis = async (
     systemPrompt: string,
@@ -27,7 +25,8 @@ const gptAnalysis = async (
         messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: transcript }
-        ]
+        ],
+        max_tokens: 150
     })
     const gptresult = completion.data.choices[0].message?.content
     return gptresult || ""
@@ -80,7 +79,11 @@ async function PostAnalysisRequestHandler(
         return next(new Error("No transcript returned by the API"))
     }
 
-    const gptresult = await gptAnalysis(role, deepgramResult).catch((err) => {
+    const option = await Option.findOne({ name: "prompt" }).exec()
+    const prompt =
+        option?.value ||
+        "En tant que vendeur dans l'industrie SAAS. Résume le contenu de la transcription de l'appel ci-dessus en mettant l'accent sur le problème ressenti par le client potentiel. La transcription du commercial et du client sont melanges. Il faut donc bien faire attention a ce que le resumé soit coherent."
+    const gptresult = await gptAnalysis(prompt, deepgramResult).catch((err) => {
         console.log(err)
         res.status(400)
         return next(new Error("Error when calling the ml API"))

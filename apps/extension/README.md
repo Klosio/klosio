@@ -28,6 +28,16 @@ npm run build
 
 This should create a production bundle for your extension, ready to be zipped and published to the stores.
 
+## Environment variables
+
+Environment variables are declared in:
+
+-   `.env.development` for dev
+-   `.env.production` for prod
+    They must always start with `PLASMO_PUBLIC_` to be accessible with `process.env.`.
+
+/!\ Plasmo only replaces these values at build time, so it is not possible to create a `getEnvVar` method to retrieve them at runtime.
+
 ## Submit to the webstores
 
 The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!

@@ -1,7 +1,11 @@
 import { Field, Form, Formik } from "formik"
 import { useNavigate } from "react-router-dom"
 
-interface LoginProps {}
+import type User from "~types/user.model"
+
+interface LoginProps {
+    onSuccess: (user: User) => void
+}
 
 interface LoginForm {
     email: string
@@ -11,7 +15,8 @@ interface LoginForm {
 
 function Login(props: LoginProps) {
     const submit = (form: LoginForm) => {
-        alert(JSON.stringify(form, null, 2))
+        //alert(JSON.stringify(form, null, 2))
+        props.onSuccess({ name: "Christophe Dupont" })
         navigate("/menu")
     }
 
@@ -27,6 +32,8 @@ function Login(props: LoginProps) {
                         </h1>
                         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                             Don’t have a Battlecard account yet ?
+                        </p>
+                        <p>
                             <a
                                 className="text-blue-600 decoration-2 hover:underline font-medium"
                                 href="../examples/html/signup.html">
