@@ -1,4 +1,4 @@
-import Painpoints from "../../../../model/Painpoints"
+import Painpoints from "../../../../repository/Painpoints"
 import { NextFunction, Request, Response } from "express"
 import { parse } from "papaparse"
 import { z } from "zod"

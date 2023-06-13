@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom"
 
 import LoginStatus from "~components/LoginStatus"
+import { supabase } from "~core/supabase"
 import type Organization from "~types/organization.model"
 import type User from "~types/user.model"
 
@@ -8,14 +9,15 @@ interface LoggedProps {
     user: User
     organization: Organization
     allowRecording: boolean
-    logout: VoidFunction
+    logout: () => Promise<void>
 }
 
 function Menu(props: LoggedProps) {
     const navigate = useNavigate()
 
-    const logout = () => {
-        // TODO : remove local session
+    const handleLogout = async () => {
+        supabase.auth.signOut()
+        await props.logout()
         navigate("/")
     }
 
@@ -47,7 +49,7 @@ function Menu(props: LoggedProps) {
             )}
 
             <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-yellow-100 border border-transparent font-semibold text-yellow-500 hover:text-white hover:bg-yellow-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-yellow-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                 Logout
             </button>

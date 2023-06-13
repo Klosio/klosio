@@ -1,4 +1,4 @@
-import Organization from "../../../model/Organization"
+import Organization from "../../../repository/Organization"
 import { NextFunction, Request, Response } from "express"
 
 async function PostOrganizationRequestHandler(
