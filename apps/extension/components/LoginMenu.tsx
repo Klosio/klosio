@@ -13,7 +13,7 @@ interface LoginForm {
     remember: boolean
 }
 
-function Login(props: LoginProps) {
+function LoginMenu(props: LoginProps) {
     const submit = (form: LoginForm) => {
         //alert(JSON.stringify(form, null, 2))
         props.onSuccess({ name: "Christophe Dupont" })
@@ -157,4 +157,4 @@ function Login(props: LoginProps) {
     )
 }
 
-export default Login
+export default LoginMenu

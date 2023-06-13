@@ -4,9 +4,9 @@ import "./style.css"
 
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 
-import Landing from "~components/Landing"
+import LandingPage from "~components/LandingPage"
 import LanguageSelection from "~components/LanguageSelection"
-import Login from "~components/Login"
+import Login from "~components/LoginMenu"
 import Menu from "~components/Menu"
 import OrganizationCreation from "~components/OrganizationCreation"
 import ProvideContext from "~components/ProvideContext"
@@ -139,7 +139,7 @@ function IndexPopup() {
                     </div>
                     <div>
                         <Routes>
-                            <Route path="/" element={<Landing />} />
+                            <Route path="/" element={<LandingPage />} />
                             <Route
                                 path="/login"
                                 element={<Login onSuccess={login} />}

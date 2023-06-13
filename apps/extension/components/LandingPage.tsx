@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 
 interface LandingProps {}
 
-function Landing(props: LandingProps) {
+function LandingPage(props: LandingProps) {
     return (
         <div className="w-full text-center">
             <Link
@@ -14,4 +14,4 @@ function Landing(props: LandingProps) {
     )
 }
 
-export default Landing
+export default LandingPage
