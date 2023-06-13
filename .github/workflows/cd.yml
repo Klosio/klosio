@@ -1,0 +1,52 @@
+name: Continuous Deployment
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    server:
+        name: Deploy Klosio server on Fly.io
+        runs-on: ubuntu-latest
+        environment: production
+        steps:
+            - uses: actions/checkout@v3
+            - uses: superfly/flyctl-actions/setup-flyctl@master
+            - run: cd ./apps/server && flyctl deploy --remote-only
+              env:
+                  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+                  DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+                  MONGO_DB_URI: ${{ secrets.MONGO_DB_URI }}
+
+    extension:
+        name: Build and package Klosio extension on Github Artifacts
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: 'Create env file'
+              run: |
+                  echo "${{ secrets.PLASMO_PROD_ENV_FILE }}" > apps/extension/.env.prod
+
+            - name: Build Project
+              run: 'npm run build:extension'
+
+            - name: Package project
+              run: 'npm run package:extension'
+
+            - name: Create Artifact
+              uses: actions/upload-artifact@v3
+              with:
+                  name: chrome-mv3-prod
+                  path: apps/extension/build/chrome-mv3-prod.zip
