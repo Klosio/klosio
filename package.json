@@ -11,8 +11,10 @@
     "build:extension": "turbo build --filter=extension",
     "package:extension": "turbo package --filter=extension",
     "dev": "turbo run dev --parallel",
+    "test": "turbo run test",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prettier:format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prettier:check": "prettier --check \"**/*.{ts,tsx,md}\"",
     "prepare": "husky install"
   },
   "author": "abbeal",

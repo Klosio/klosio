@@ -1,0 +1,46 @@
+name: Continuous Integration
+
+on:
+    pull_request:
+        branches: [main]
+
+jobs:
+    format:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  # Make sure the actual branch is checked out when running on pull requests
+                  ref: ${{ github.head_ref }}
+                  # This is important to fetch the changes to the previous commit
+                  fetch-depth: 0
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Prettify code
+              run: 'npm run prettier:check'
+
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '18'
+
+            - name: Install Dependencies
+              run: npm ci
+
+            - name: Launch test
+              run: npm run test
