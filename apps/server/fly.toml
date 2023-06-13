@@ -8,6 +8,8 @@ primary_region = "yul"
 
 [env]
   DEEPGRAM_API_KEY = "secret_define_manually"
+  OPENAI_API_KEY = "secret_define_manually"
+  MONGO_DB_URI = "secret_define_manually"
   NODE_ENV = "prod"
   PORT = "3000"
 

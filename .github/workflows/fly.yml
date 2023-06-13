@@ -1,0 +1,19 @@
+name: Fly Deploy
+on:
+    push:
+        branches:
+            - main
+jobs:
+    deploy:
+        name: Deploy app
+        runs-on: ubuntu-latest
+        environment: production
+        steps:
+            - uses: actions/checkout@v3
+            - uses: superfly/flyctl-actions/setup-flyctl@master
+            - run: cd ./apps/server && flyctl deploy --remote-only
+              env:
+                  FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+                  DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY }}
+                  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+                  MONGO_DB_URI: ${{ secrets.MONGO_DB_URI }}
