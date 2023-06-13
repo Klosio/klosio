@@ -22,7 +22,7 @@ async function PostOrganizationRequestHandler(
             new Error(`Error when saving organization ${organization.name}`)
         )
     }
-    return res.sendStatus(204)
+    return res.status(201).json(organization.toJSON())
 }
 
 export default PostOrganizationRequestHandler

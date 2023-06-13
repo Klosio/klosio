@@ -177,7 +177,11 @@ function IndexPopup() {
                             />
                             <Route
                                 path="/provideContext"
-                                element={<ProvideContext />}
+                                element={
+                                    <ProvideContext
+                                        organization={organization}
+                                    />
+                                }
                             />
                         </Routes>
                     </div>

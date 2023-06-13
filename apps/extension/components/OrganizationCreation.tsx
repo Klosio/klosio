@@ -26,7 +26,8 @@ function OrganizationCreation(props: OrganizationCreationProps) {
             console.error("Error on organization save")
             return
         }
-        props.onSuccess({ name: form.name })
+        const data = (await response.json()) as Organization
+        props.onSuccess(data)
         navigate("/menu")
     }
 
