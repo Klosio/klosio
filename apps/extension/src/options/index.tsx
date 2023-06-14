@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 
 import type Option from "~types/option.model"
 
-import "./style.css"
+import "~/style.css"
 
 import("preline")
 
