@@ -137,7 +137,7 @@ const CustomButton = () => {
         <div className="flex flex-col items-end">
             {displayChatbot && <Chatbot {...{ language, battlecards }} />}
             <button onClick={() => setDisplayChatbot(!displayChatbot)}>
-                <span className="m-1 inline-flex justify-center items-center w-[46px] h-[46px] rounded-md bg-blue-600 text-white">
+                <span className="m-1 inline-flex justify-center items-center w-[46px] h-[46px] rounded-md bg-klosio-blue-600 text-white">
                     <svg
                         className="w-5 h-5"
                         width="24"
