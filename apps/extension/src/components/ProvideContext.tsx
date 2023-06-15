@@ -83,7 +83,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <input
                                                     type="text"
                                                     {...field}
-                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                                     placeholder="Software as a Service"
                                                     required
                                                 />
@@ -111,7 +111,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <input
                                                     type="text"
                                                     {...field}
-                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                                     placeholder="Scheduling and workforce management software"
                                                     required
                                                 />
@@ -138,7 +138,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <textarea
                                                     type="text"
                                                     {...field}
-                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                                     placeholder="Companies in Healthcare, Manufacturing, Hospitality, Retail..."
                                                     required
                                                 />
@@ -170,7 +170,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <input
                                                     type="file"
                                                     name="file"
-                                                    className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
+                                                    className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
                                                                 file:bg-transparent file:border-0
                                                                 file:bg-gray-100 file:mr-4
                                                                 file:py-3 file:px-4
@@ -197,7 +197,7 @@ function ProvideContext(props: ProvideContextProps) {
                                 </Field>
                                 <button
                                     type="submit"
-                                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
                                     disabled={isSubmitting}>
                                     Save
                                 </button>

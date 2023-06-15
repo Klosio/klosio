@@ -42,7 +42,7 @@ function LanguageSelection(props: LanguageSelectionProps) {
                         value={selectedCountry.code}
                         onChange={handleChange}
                         id="af-submit-app-category"
-                        className="py-2 px-3 pr-9 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
+                        className="py-2 px-3 pr-9 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
                         {languages.map((language) => (
                             <option key={language.code} value={language.code}>
                                 {language.emoji} {language.label}
@@ -52,7 +52,7 @@ function LanguageSelection(props: LanguageSelectionProps) {
                 </div>
                 <button
                     onClick={startMeeting}
-                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-green-500 text-white hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-green-300 text-white hover:bg-klosio-green-400 focus:outline-none focus:ring-2 focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                     Start
                 </button>
             </div>

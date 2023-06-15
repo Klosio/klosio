@@ -62,7 +62,7 @@ function LoginMenu(props: LoginProps) {
                         </p>
                         <p>
                             <Link
-                                className="text-blue-600 decoration-2 hover:underline font-medium"
+                                className="text-klosio-blue-600 decoration-2 hover:underline font-medium"
                                 to="/signup">
                                 Sign up here
                             </Link>
@@ -91,7 +91,7 @@ function LoginMenu(props: LoginProps) {
                                         type="email"
                                         id="email"
                                         name="email"
-                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                         required
                                         aria-describedby="email-error"
                                     />
@@ -122,7 +122,7 @@ function LoginMenu(props: LoginProps) {
                                         Password
                                     </label>
                                     <a
-                                        className="text-sm text-blue-600 decoration-2 hover:underline font-medium"
+                                        className="text-sm text-klosio-blue-600 decoration-2 hover:underline font-medium"
                                         href="../examples/html/recover-account.html">
                                         Forgot password?
                                     </a>
@@ -132,7 +132,7 @@ function LoginMenu(props: LoginProps) {
                                         type="password"
                                         id="password"
                                         name="password"
-                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                         required
                                         aria-describedby="password-error"
                                     />
@@ -160,7 +160,7 @@ function LoginMenu(props: LoginProps) {
                                         id="remember"
                                         name="remember"
                                         type="checkbox"
-                                        className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 pointer-events-none focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                                        className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-500"
                                     />
                                 </div>
                                 <div className="ml-3">
@@ -173,7 +173,7 @@ function LoginMenu(props: LoginProps) {
                             </div>
                             <button
                                 type="submit"
-                                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm">
                                 Sign in
                             </button>
                         </div>
