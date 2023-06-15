@@ -1,4 +1,4 @@
-import Option from "../../../model/Option"
+import Option from "../../../repository/Option"
 import { NextFunction, Request, Response } from "express"
 
 async function GetOptionRequestHandler(

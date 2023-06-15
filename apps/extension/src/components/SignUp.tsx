@@ -1,48 +1,50 @@
 import { Field, Form, Formik } from "formik"
-import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import { supabase } from "~core/supabase"
 import type User from "~types/user.model"
 
-interface LoginProps {
+interface SignUpProps {
     onSuccess: (user: User) => Promise<void>
 }
 
-interface LoginForm {
+interface SignUpForm {
     email: string
     password: string
-    remember: boolean
 }
 
-function LoginMenu(props: LoginProps) {
-    const navigate = useNavigate()
-
-    const submitSignIn = async (form: LoginForm) => {
-        const response = await handleEmailLogin(form.email, form.password)
+function SignUp(props: SignUpProps) {
+    const submit = async (form: SignUpForm) => {
+        const response = await handleSignUp(form.email, form.password)
         if (!response.ok) {
             alert(response.message)
             return
         }
         await props.onSuccess({ name: response.user.email })
+        alert(response.message)
         navigate("/menu")
     }
 
-    const handleEmailLogin = async (username: string, password: string) => {
+    const navigate = useNavigate()
+
+    const handleSignUp = async (username: string, password: string) => {
         try {
             const {
                 error,
                 data: { user }
-            } = await supabase.auth.signInWithPassword({
-                email: username,
-                password
-            })
+            } = await supabase.auth.signUp({ email: username, password })
 
             if (error) {
                 console.log("Error with auth: " + error.message)
                 return { ok: false, message: error.message }
             }
-            return { ok: true, user: user }
+            return {
+                ok: true,
+                user: user,
+                message:
+                    "Signup successful, confirmation mail should be sent soon!"
+            }
         } catch (error) {
             console.log("error", error)
             return { ok: false, message: "An error occured, please try again." }
@@ -55,16 +57,16 @@ function LoginMenu(props: LoginProps) {
                 <div className="">
                     <div className="text-center">
                         <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-                            Sign in
+                            Sign up
                         </h1>
                         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Don’t have a Battlecard account yet?
+                            Already have a Battlecard account?
                         </p>
                         <p>
                             <Link
                                 className="text-blue-600 decoration-2 hover:underline font-medium"
-                                to="/signup">
-                                Sign up here
+                                to="/login">
+                                Sign in here
                             </Link>
                         </p>
                     </div>
@@ -73,11 +75,10 @@ function LoginMenu(props: LoginProps) {
                     initialValues={
                         {
                             email: "",
-                            password: "",
-                            remember: false
-                        } as LoginForm
+                            password: ""
+                        } as SignUpForm
                     }
-                    onSubmit={submitSignIn}>
+                    onSubmit={submit}>
                     <Form>
                         <div className="grid gap-y-4">
                             <div>
@@ -174,7 +175,7 @@ function LoginMenu(props: LoginProps) {
                             <button
                                 type="submit"
                                 className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                                Sign in
+                                Sign up
                             </button>
                         </div>
                     </Form>
@@ -184,4 +185,4 @@ function LoginMenu(props: LoginProps) {
     )
 }
 
-export default LoginMenu
+export default SignUp

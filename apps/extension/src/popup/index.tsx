@@ -4,30 +4,51 @@ import "~/style.css"
 
 import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 
+import { Storage } from "@plasmohq/storage"
+import { useStorage } from "@plasmohq/storage/hook"
+
 import LandingPage from "~components/LandingPage"
 import LanguageSelection from "~components/LanguageSelection"
-import Login from "~components/LoginMenu"
+import LoginMenu from "~components/LoginMenu"
 import Menu from "~components/Menu"
 import OrganizationCreation from "~components/OrganizationCreation"
 import ProvideContext from "~components/ProvideContext"
+import SignUp from "~components/SignUp"
 import { getCurrentTab, startRecording } from "~core/recorder"
+import { supabase } from "~core/supabase"
 import type Organization from "~types/organization.model"
 import type User from "~types/user.model"
 
 import("preline")
 
 function IndexPopup() {
-    const [user, setUser] = useState<User>()
+    const [user, setUser] = useStorage<User>({
+        key: "user",
+        instance: new Storage({
+            area: "local"
+        })
+    })
     const [organization, setOrganization] = useState<Organization>()
     const [currentTab, setCurrentTab] = useState(null)
 
+    const init = async () => {
+        const { data, error } = await supabase.auth.getSession()
+
+        if (error) {
+            console.error(error)
+            return
+        }
+        if (data.session) {
+            setUser({ name: data.session.user.email })
+        }
+    }
+
     useEffect(() => {
-        // Get user state from storage
-        setUser({ name: "Christophe Dupont" })
+        init()
         getCurrentTab().then((t) => setCurrentTab(t))
     }, [])
 
-    function updateOrganization(organization: Organization) {
+    function updateOrganization(organization: Organization): void {
         setOrganization(organization)
     }
 
@@ -36,12 +57,12 @@ function IndexPopup() {
         return regex.test(url)
     }
 
-    function logout(): void {
-        setUser(null)
+    async function logout(): Promise<void> {
+        await setUser(null)
     }
 
-    function login(user: User): void {
-        setUser(user)
+    async function login(user: User): Promise<void> {
+        await setUser(user)
     }
 
     return (
@@ -56,10 +77,17 @@ function IndexPopup() {
                     </div>
                     <div>
                         <Routes>
-                            <Route path="/" element={<LandingPage />} />
+                            <Route
+                                path="/"
+                                element={<LandingPage {...{ user }} />}
+                            />
+                            <Route
+                                path="/signup"
+                                element={<SignUp onSuccess={login} />}
+                            />
                             <Route
                                 path="/login"
-                                element={<Login onSuccess={login} />}
+                                element={<LoginMenu onSuccess={login} />}
                             />
                             <Route
                                 path="/menu"
@@ -104,10 +132,6 @@ function IndexPopup() {
                     </div>
                 </div>
             </MemoryRouter>
-            <script
-                src="https://accounts.google.com/gsi/client"
-                async
-                defer></script>
         </>
     )
 }

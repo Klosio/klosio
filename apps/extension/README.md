@@ -33,7 +33,7 @@ This should create a production bundle for your extension, ready to be zipped an
 Environment variables are declared in:
 
 -   `.env.development` for dev
--   `.env.production` for prod
+-   `.env.prod` for prod
     They must always start with `PLASMO_PUBLIC_` to be accessible with `process.env.`.
 
 /!\ Plasmo only replaces these values at build time, so it is not possible to create a `getEnvVar` method to retrieve them at runtime.

@@ -1,4 +1,4 @@
-import Option from "../../../model/Option"
+import Option from "../../../repository/Option"
 import getEnvVar from "../../../util/env"
 import supportedLanguages from "../../../util/supportedLanguages"
 import { Deepgram } from "@deepgram/sdk"
