@@ -1,12 +1,9 @@
 import apiRouter from "./api/router"
 import * as middlewares from "./middlewares/middlewares"
-import getEnvVar from "./util/env"
 import cors from "cors"
 import express from "express"
 import helmet from "helmet"
 import morgan from "morgan"
-
-const extensionUri = getEnvVar("EXTENSION_URI")
 
 const app = express()
 
