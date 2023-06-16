@@ -1,6 +1,5 @@
+import BattlecardComponent from "~components/Battlecard"
 import type Battlecard from "~types/battlecard.model"
-
-import BattlecardComponent from "./Battlecard"
 
 interface ChatbotProps {
     language: string

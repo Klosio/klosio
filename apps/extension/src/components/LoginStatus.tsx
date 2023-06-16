@@ -1,9 +1,7 @@
-import type Organization from "~types/organization.model"
 import type User from "~types/user.model"
 
 interface LoginStatusProps {
     user: User
-    organization: Organization
 }
 
 function LoginStatus(props: LoginStatusProps) {
@@ -13,10 +11,10 @@ function LoginStatus(props: LoginStatusProps) {
                 <p className="font-semi-bold">Connected as</p>
                 <p className="font-bold">{props.user?.email}</p>
             </div>
-            {props.organization && (
+            {props.user.organization && (
                 <div>
                     <p className="font-semi-bold">Connected to</p>
-                    <p className="font-bold">{props.organization.name}</p>
+                    <p className="font-bold">{props.user.organization.name}</p>
                 </div>
             )}
         </>

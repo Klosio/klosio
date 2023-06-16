@@ -7,6 +7,22 @@ export function notFound(req: Request, res: Response, next: NextFunction) {
     next(error)
 }
 
+export function authErrorHandler(
+    err: Error,
+    req: Request,
+    res: Response<ErrorResponse>,
+    next: NextFunction
+) {
+    if (err.name === "UnauthorizedError") {
+        res.status(401).json({
+            message: "Invalid token",
+            stack: process.env.NODE_ENV === "prod" ? "🐝" : err.stack
+        })
+    } else {
+        next(err)
+    }
+}
+
 export function errorHandler(
     err: Error,
     req: Request,

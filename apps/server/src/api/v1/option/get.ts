@@ -11,7 +11,7 @@ async function GetOptionRequestHandler(
         return next(new Error("No name specified for option"))
     }
 
-    let option = await Option.findOne({ name: req.params.name }).exec()
+    const option = await Option.findOne({ name: req.params.name }).exec()
     if (!option) {
         res.status(404)
         return next(new Error(`No option found with name ${req.params.name}`))

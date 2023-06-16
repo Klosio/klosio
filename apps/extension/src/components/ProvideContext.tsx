@@ -3,11 +3,8 @@ import csvFileTemplate from "raw:~/assets/painpoints-template.csv"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
+import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
-
-interface ProvideContextProps {
-    organization: Organization
-}
 
 interface ProvideContextForm {
     industry: string
@@ -18,13 +15,14 @@ interface ProvideContextForm {
 
 const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
-function ProvideContext(props: ProvideContextProps) {
+function ProvideContext() {
     const [csvFile, setCsvFile] = useState<File>(null)
+    const { userSession } = useAuth()
 
     const navigate = useNavigate()
 
     const submit = async (form: ProvideContextForm) => {
-        const response = await savePainpoints(props.organization)
+        const response = await savePainpoints(userSession.user.organization)
         if (!response.ok) {
             console.error("Error on pain points save")
             return
@@ -41,6 +39,9 @@ function ProvideContext(props: ProvideContextProps) {
             `${serverUri}/api/v1/organizations/${organization._id}/painpoints`,
             {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${userSession.token}`
+                },
                 body: formData
             }
         )

@@ -1,34 +1,52 @@
 import { Field, Form, Formik } from "formik"
 import { useNavigate } from "react-router-dom"
 
+import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
-
-interface OrganizationCreationProps {
-    onSuccess: (organization: Organization) => void
-}
+import type User from "~types/user.model"
 
 interface OrganizationCreationForm {
     name: string
+    user: User
 }
 
 const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
-function OrganizationCreation(props: OrganizationCreationProps) {
+function OrganizationCreation() {
+    const { userSession, updateSession } = useAuth()
     const navigate = useNavigate()
 
-    const submit = async (form: OrganizationCreationForm) => {
+    const submitOrganizationCreation = async (
+        form: OrganizationCreationForm
+    ) => {
+        form.user = userSession.user
+        const organization = await createOrganization(form)
+        if (!organization) {
+            alert("An error occured, please try again.")
+            return
+        }
+        alert("Organization created with success")
+        userSession.user.organization = organization
+        await updateSession(userSession)
+        navigate("/menu")
+    }
+
+    const createOrganization = async (
+        form: OrganizationCreationForm
+    ): Promise<Organization> => {
         const response = await fetch(`${serverUri}/api/v1/organizations/`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userSession.token}`
+            },
             body: JSON.stringify(form)
         })
         if (!response.ok) {
-            console.error("Error on organization save")
+            console.error("Error when saving organization")
             return
         }
-        const data = (await response.json()) as Organization
-        props.onSuccess(data)
-        navigate("/menu")
+        return (await response.json()) as Organization
     }
 
     return (
@@ -48,7 +66,7 @@ function OrganizationCreation(props: OrganizationCreationProps) {
                             name: ""
                         } as OrganizationCreationForm
                     }
-                    onSubmit={submit}>
+                    onSubmit={submitOrganizationCreation}>
                     {({ isSubmitting }) => (
                         <Form>
                             <div className="grid gap-y-4 mt-2">

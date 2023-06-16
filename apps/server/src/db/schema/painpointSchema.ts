@@ -1,6 +1,6 @@
-import mongoose, { Schema } from "mongoose"
+import { Schema } from "mongoose"
 
-const painpointsSchema = new Schema({
+const painpointSchema = new Schema({
     organization_id: {
         type: String,
         required: true
@@ -15,6 +15,4 @@ const painpointsSchema = new Schema({
     }
 })
 
-const Painpoints = mongoose.model("Painpoints", painpointsSchema)
-
-export default Painpoints
+export default painpointSchema
