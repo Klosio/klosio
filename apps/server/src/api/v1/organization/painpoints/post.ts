@@ -55,6 +55,7 @@ async function PostPainpointsRequestHandler(
     const verify = z.array(painpointSchema).min(1).max(100).safeParse(data)
 
     if (!verify.success) {
+        console.error(verify.error)
         res.status(400)
         return next(new Error("File is not formatted correctly"))
     }

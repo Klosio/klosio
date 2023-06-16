@@ -14,6 +14,11 @@ interface LoginForm {
     password: string
     remember: boolean
 }
+interface EmailLoginResponse {
+    ok: boolean
+    user?: User
+    message?: string
+}
 
 function LoginMenu(props: LoginProps) {
     const navigate = useNavigate()
@@ -24,11 +29,14 @@ function LoginMenu(props: LoginProps) {
             alert(response.message)
             return
         }
-        await props.onSuccess({ name: response.user.email })
+        await props.onSuccess(response.user)
         navigate("/menu")
     }
 
-    const handleEmailLogin = async (username: string, password: string) => {
+    const handleEmailLogin = async (
+        username: string,
+        password: string
+    ): Promise<EmailLoginResponse> => {
         try {
             const {
                 error,
@@ -39,10 +47,10 @@ function LoginMenu(props: LoginProps) {
             })
 
             if (error) {
-                console.log("Error with auth: " + error.message)
+                console.log(`Error with auth: ${error.message}`)
                 return { ok: false, message: error.message }
             }
-            return { ok: true, user: user }
+            return { ok: true, user: { email: user.email } }
         } catch (error) {
             console.log("error", error)
             return { ok: false, message: "An error occured, please try again." }
@@ -52,22 +60,20 @@ function LoginMenu(props: LoginProps) {
     return (
         <>
             <div className="flex flex-col w-full">
-                <div className="">
-                    <div className="text-center">
-                        <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-                            Sign in
-                        </h1>
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Don’t have a Battlecard account yet?
-                        </p>
-                        <p>
-                            <Link
-                                className="text-klosio-blue-600 decoration-2 hover:underline font-medium"
-                                to="/signup">
-                                Sign up here
-                            </Link>
-                        </p>
-                    </div>
+                <div className="text-center">
+                    <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
+                        Sign in
+                    </h1>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        Don’t have a Battlecard account yet?
+                    </p>
+                    <p>
+                        <Link
+                            className="text-klosio-blue-600 decoration-2 hover:underline font-medium"
+                            to="/signup">
+                            Sign up here
+                        </Link>
+                    </p>
                 </div>
                 <Formik
                     initialValues={
@@ -91,7 +97,7 @@ function LoginMenu(props: LoginProps) {
                                         type="email"
                                         id="email"
                                         name="email"
-                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                         required
                                         aria-describedby="email-error"
                                     />
@@ -132,7 +138,7 @@ function LoginMenu(props: LoginProps) {
                                         type="password"
                                         id="password"
                                         name="password"
-                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                         required
                                         aria-describedby="password-error"
                                     />
@@ -160,7 +166,7 @@ function LoginMenu(props: LoginProps) {
                                         id="remember"
                                         name="remember"
                                         type="checkbox"
-                                        className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-500"
+                                        className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-300"
                                     />
                                 </div>
                                 <div className="ml-3">
@@ -173,7 +179,7 @@ function LoginMenu(props: LoginProps) {
                             </div>
                             <button
                                 type="submit"
-                                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm">
+                                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm">
                                 Sign in
                             </button>
                         </div>

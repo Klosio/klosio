@@ -1,4 +1,5 @@
 import { Field, Form, Formik } from "formik"
+import csvFileTemplate from "raw:~/assets/painpoints-template.csv"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -15,16 +16,17 @@ interface ProvideContextForm {
     file: unknown
 }
 
+const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
+
 function ProvideContext(props: ProvideContextProps) {
     const [csvFile, setCsvFile] = useState<File>(null)
 
     const navigate = useNavigate()
 
     const submit = async (form: ProvideContextForm) => {
-        // alert(JSON.stringify(form, null, 2))
         const response = await savePainpoints(props.organization)
         if (!response.ok) {
-            console.error("Error on organization save")
+            console.error("Error on pain points save")
             return
         }
         navigate("/menu")
@@ -36,7 +38,7 @@ function ProvideContext(props: ProvideContextProps) {
         const formData = new FormData()
         formData.append("file", csvFile)
         return await fetch(
-            `http://localhost:3000/api/v1/organizations/${organization._id}/painpoints`,
+            `${serverUri}/api/v1/organizations/${organization._id}/painpoints`,
             {
                 method: "POST",
                 body: formData
@@ -47,16 +49,14 @@ function ProvideContext(props: ProvideContextProps) {
     return (
         <>
             <div className="flex flex-col w-full">
-                <div className="">
-                    <div className="text-center">
-                        <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-                            Provide context
-                        </h1>
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Give information about your business context to get
-                            accurate real-time battlecards
-                        </p>
-                    </div>
+                <div className="text-center">
+                    <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
+                        Provide context
+                    </h1>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        Give information about your business context to get
+                        accurate real-time battlecards
+                    </p>
                 </div>
                 <Formik
                     initialValues={
@@ -83,7 +83,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <input
                                                     type="text"
                                                     {...field}
-                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                                     placeholder="Software as a Service"
                                                     required
                                                 />
@@ -111,7 +111,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <input
                                                     type="text"
                                                     {...field}
-                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                                     placeholder="Scheduling and workforce management software"
                                                     required
                                                 />
@@ -138,7 +138,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <textarea
                                                     type="text"
                                                     {...field}
-                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                                     placeholder="Companies in Healthcare, Manufacturing, Hospitality, Retail..."
                                                     required
                                                 />
@@ -153,6 +153,12 @@ function ProvideContext(props: ProvideContextProps) {
                                         </div>
                                     )}
                                 </Field>
+                                <a
+                                    href={csvFileTemplate}
+                                    download
+                                    className="text-klosio-blue-600 decoration-2 hover:underline font-medium">
+                                    Download .csv template
+                                </a>
                                 <Field name="file" type="file">
                                     {({ field, form, meta }) => (
                                         <div>
@@ -170,7 +176,7 @@ function ProvideContext(props: ProvideContextProps) {
                                                 <input
                                                     type="file"
                                                     name="file"
-                                                    className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
+                                                    className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
                                                                 file:bg-transparent file:border-0
                                                                 file:bg-gray-100 file:mr-4
                                                                 file:py-3 file:px-4
@@ -197,7 +203,7 @@ function ProvideContext(props: ProvideContextProps) {
                                 </Field>
                                 <button
                                     type="submit"
-                                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
                                     disabled={isSubmitting}>
                                     Save
                                 </button>

@@ -34,7 +34,7 @@ function Menu(props: LoggedProps) {
                     </button>
                     <button
                         onClick={() => navigate("/provideContext")}
-                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-klosio-green-100 border border-transparent font-semibold text-klosio-green-300 hover:bg-klosio-green-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-klosio-green-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-klosio-green-100 border border-transparent font-semibold text-klosio-green-300 hover:bg-klosio-green-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                         Provide Context
                     </button>
                 </>
@@ -42,7 +42,7 @@ function Menu(props: LoggedProps) {
                 <>
                     <button
                         onClick={() => navigate("/createOrganization")}
-                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold disabled:cursor-not-allowed disabled:bg-klosio-green-300 bg-klosio-green-400 text-white hover:bg-klosio-green-500 focus:outline-none focus:ring-2 focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold disabled:cursor-not-allowed disabled:bg-klosio-green-300 bg-klosio-green-400 text-white hover:bg-klosio-green-300 focus:outline-none focus:ring-2 focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                         Create an organization
                     </button>
                 </>

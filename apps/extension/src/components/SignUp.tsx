@@ -14,6 +14,12 @@ interface SignUpForm {
     password: string
 }
 
+interface SignUpResponse {
+    ok: boolean
+    user?: User
+    message?: string
+}
+
 function SignUp(props: SignUpProps) {
     const submit = async (form: SignUpForm) => {
         const response = await handleSignUp(form.email, form.password)
@@ -21,14 +27,17 @@ function SignUp(props: SignUpProps) {
             alert(response.message)
             return
         }
-        await props.onSuccess({ name: response.user.email })
+        await props.onSuccess(response.user)
         alert(response.message)
         navigate("/menu")
     }
 
     const navigate = useNavigate()
 
-    const handleSignUp = async (username: string, password: string) => {
+    const handleSignUp = async (
+        username: string,
+        password: string
+    ): Promise<SignUpResponse> => {
         try {
             const {
                 error,
@@ -36,12 +45,14 @@ function SignUp(props: SignUpProps) {
             } = await supabase.auth.signUp({ email: username, password })
 
             if (error) {
-                console.log("Error with auth: " + error.message)
+                console.log(`Error with auth: ${error.message}`)
                 return { ok: false, message: error.message }
             }
             return {
                 ok: true,
-                user: user,
+                user: {
+                    email: user.email
+                },
                 message:
                     "Signup successful, confirmation mail should be sent soon!"
             }
@@ -64,7 +75,7 @@ function SignUp(props: SignUpProps) {
                         </p>
                         <p>
                             <Link
-                                className="text-blue-600 decoration-2 hover:underline font-medium"
+                                className="text-klosio-blue-600 decoration-2 hover:underline font-medium"
                                 to="/login">
                                 Sign in here
                             </Link>
@@ -92,7 +103,7 @@ function SignUp(props: SignUpProps) {
                                         type="email"
                                         id="email"
                                         name="email"
-                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                         required
                                         aria-describedby="email-error"
                                     />
@@ -123,7 +134,7 @@ function SignUp(props: SignUpProps) {
                                         Password
                                     </label>
                                     <a
-                                        className="text-sm text-blue-600 decoration-2 hover:underline font-medium"
+                                        className="text-sm text-klosio-blue-600 decoration-2 hover:underline font-medium"
                                         href="../examples/html/recover-account.html">
                                         Forgot password?
                                     </a>
@@ -133,7 +144,7 @@ function SignUp(props: SignUpProps) {
                                         type="password"
                                         id="password"
                                         name="password"
-                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                         required
                                         aria-describedby="password-error"
                                     />
@@ -161,7 +172,7 @@ function SignUp(props: SignUpProps) {
                                         id="remember"
                                         name="remember"
                                         type="checkbox"
-                                        className="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 pointer-events-none focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                                        className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:checked:bg-klosio-blue-300 dark:checked:border-klosio-blue-300 dark:focus:ring-offset-gray-800"
                                     />
                                 </div>
                                 <div className="ml-3">
@@ -174,7 +185,7 @@ function SignUp(props: SignUpProps) {
                             </div>
                             <button
                                 type="submit"
-                                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                                 Sign up
                             </button>
                         </div>

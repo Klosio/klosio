@@ -42,7 +42,7 @@ function LanguageSelection(props: LanguageSelectionProps) {
                         value={selectedCountry.code}
                         onChange={handleChange}
                         id="af-submit-app-category"
-                        className="py-2 px-3 pr-9 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
+                        className="py-2 px-3 pr-9 block w-full border-gray-200 shadow-sm rounded-lg text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400">
                         {languages.map((language) => (
                             <option key={language.code} value={language.code}>
                                 {language.emoji} {language.label}
