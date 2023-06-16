@@ -11,7 +11,7 @@ function LoginStatus(props: LoginStatusProps) {
         <>
             <div>
                 <p className="font-semi-bold">Connected as</p>
-                <p className="font-bold">{props.user?.name}</p>
+                <p className="font-bold">{props.user?.email}</p>
             </div>
             {props.organization && (
                 <div>

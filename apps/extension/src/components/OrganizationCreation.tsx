@@ -34,12 +34,13 @@ function OrganizationCreation(props: OrganizationCreationProps) {
     return (
         <>
             <div className="flex flex-col w-full">
-                <div className="">
-                    <div className="text-center">
-                        <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
-                            Create an organization
-                        </h1>
-                    </div>
+                <div className="text-center">
+                    <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
+                        Create an organization
+                    </h1>
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                        You will be the only administrator of this organization
+                    </p>
                 </div>
                 <Formik
                     initialValues={
@@ -62,7 +63,7 @@ function OrganizationCreation(props: OrganizationCreationProps) {
                                             type="text"
                                             id="name"
                                             name="name"
-                                            className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                            className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                             required
                                             aria-describedby="name-error"
                                         />
@@ -87,7 +88,7 @@ function OrganizationCreation(props: OrganizationCreationProps) {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                                     Create
                                 </button>
                             </div>

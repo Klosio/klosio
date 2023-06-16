@@ -2,13 +2,7 @@ import { useEffect, useState } from "react"
 
 import "~/style.css"
 
-import {
-    Link,
-    MemoryRouter,
-    Route,
-    Routes,
-    useNavigation
-} from "react-router-dom"
+import { Link, MemoryRouter, Route, Routes } from "react-router-dom"
 
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
@@ -37,7 +31,7 @@ function IndexPopup() {
     const [organization, setOrganization] = useState<Organization>()
     const [currentTab, setCurrentTab] = useState(null)
 
-    const init = async () => {
+    const fetchUserSession = async () => {
         const { data, error } = await supabase.auth.getSession()
 
         if (error) {
@@ -45,12 +39,12 @@ function IndexPopup() {
             return
         }
         if (data.session) {
-            setUser({ name: data.session.user.email })
+            setUser({ email: data.session.user.email })
         }
     }
 
     useEffect(() => {
-        init()
+        fetchUserSession()
         getCurrentTab().then((t) => setCurrentTab(t))
     }, [])
 
@@ -85,11 +79,11 @@ function IndexPopup() {
                                 width="24"
                                 height="24"
                                 viewBox="0 0 24 24"
-                                stroke-width="2"
+                                strokeWidth="2"
                                 stroke="currentColor"
                                 fill="none"
-                                stroke-linecap="round"
-                                stroke-linejoin="round">
+                                strokeLinecap="round"
+                                strokeLinejoin="round">
                                 <path
                                     stroke="none"
                                     d="M0 0h24v24H0z"
