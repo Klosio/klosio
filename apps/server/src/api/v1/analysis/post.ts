@@ -1,11 +1,10 @@
-import Option from "../../../repository/Option"
-import { searchEmbeddings } from "../../../util/embeddings"
-import getEnvVar from "../../../util/env"
-import supportedLanguages from "../../../util/supportedLanguages"
 import { Deepgram } from "@deepgram/sdk"
 import dotenv from "dotenv"
 import { NextFunction, Request, Response } from "express"
 import { Configuration, OpenAIApi } from "openai"
+import { searchEmbeddings } from "../../../util/embeddings"
+import getEnvVar from "../../../util/env"
+import supportedLanguages from "../../../util/supportedLanguages"
 
 dotenv.config()
 
