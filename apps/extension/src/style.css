@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.dot-container{
+    display: flex;
+}
+.dot{
+  height: 5px;
+  width: 5px;
+  background: #46DCC3;
+  border-radius: 50%;
+  margin: 3px;
+}
+.dot-animate1{
+   animation: load 0.8s infinite alternate;
+  transform-origin: center;
+}
+.dot-animate2{
+   animation: load 0.8s infinite alternate;
+  transform-origin: center;
+  animation-delay: 0.2s;
+}
+.dot-animate3{
+   animation: load 0.8s infinite alternate;
+  transform-origin: center;
+  animation-delay: 0.4s;
+}
+@keyframes load{
+  100%{
+    transform: scale(1.8);
+  }
+}
