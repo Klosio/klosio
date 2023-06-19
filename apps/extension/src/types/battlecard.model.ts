@@ -1,4 +1,5 @@
-export default interface Battlecard {
-    painpoint: string
-    analysis: string
+export default interface BattlecardResponse {
+    status: string
+    question: string
+    answer: string
 }
