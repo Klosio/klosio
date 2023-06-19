@@ -1,4 +1,5 @@
-import Painpoints from "../../../../repository/Painpoints"
+import { generateEmbeddings } from "../../../../util/embeddings"
+import { supabaseClient } from "../../../../util/supabase"
 import { NextFunction, Request, Response } from "express"
 import { parse } from "papaparse"
 import { z } from "zod"
@@ -60,11 +61,18 @@ async function PostPainpointsRequestHandler(
         return next(new Error("File is not formatted correctly"))
     }
 
-    Painpoints.deleteMany({ organization_id: organizationId }).then(() =>
-        Painpoints.insertMany(
-            data.map((d) => ({ ...d, organization_id: organizationId }))
-        )
-    )
+    const embeddings = await generateEmbeddings(data, organizationId)
+
+    const { error } = await supabaseClient
+        .from("painpoints")
+        .delete()
+        .eq("organization_id", organizationId)
+        .then(() => supabaseClient.from("painpoints").insert(embeddings))
+
+    if (error) {
+        res.status(500)
+        return next(new Error("Error inserting painpoints"))
+    }
 
     return res.sendStatus(200)
 }
