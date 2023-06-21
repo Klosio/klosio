@@ -1,6 +1,7 @@
 import { EmbeddedPainpoint, Painpoint } from "../types/Painpoint"
 import getEnvVar from "./env"
 import { supabaseClient } from "./supabase"
+import { json } from "body-parser"
 import { Configuration, OpenAIApi } from "openai"
 
 const openApiKey = getEnvVar("OPENAI_API_KEY")
@@ -43,7 +44,7 @@ async function getEmbeddings(organization_id: string): Promise<Painpoint[]> {
 async function searchEmbeddings(
     question: string,
     organization_id: string
-): Promise<string> {
+): Promise<EmbeddingResponse> {
     // OpenAI recommends replacing newlines with spaces for best results
     const input = question.replace(/\n/g, " ")
 
@@ -70,7 +71,7 @@ async function searchEmbeddings(
     )
 
     if (!documents) {
-        return "Sorry, I don't know how to help with that."
+        return { status: "Sorry, I don't know how to help with that." }
     }
 
     console.log(error)
@@ -81,30 +82,50 @@ async function searchEmbeddings(
     )
 
     const prompt = `
-        Suivant la question posée, voici les réponses que tu devrais donner à ton client:
+    "Suivant la question posée, voici les réponses que tu pourrais donner à ton client :
 
-        Question:
-        ${question}
-
-        Reponses possibles:
-        ${painpoints}
+    Question :
+    ${question}
     
-        Repond uniquement avec la reponse n'hesite pas a reformuler pour que ton client comprenne bien.
+    Réponses possibles :
+    ${painpoints}
+    
+    Réponds à ton client en fonction de ces réponses exclusivement. Si tu n'a pas suffisament d'information dans la question ou ne sais pas quoi répondre, ne repond rien.
+    Retourne les réponses que tu as données à ton client, ainsi que le pain point que tu as utilisé reformulé sous forme d'une question simple.
+    
+    Renvoie la réponse dans un format JSON avec les clés 'question' et 'answer'. Si tu n'as pas répondu à la question, renvoie une réponse vide."
     `
 
-    // In production we should handle possible errors
     const completionResponse = await openai.createCompletion({
         model: "text-davinci-003",
         prompt,
-        max_tokens: 512, // Choose the max allowed tokens in completion
-        temperature: 0 // Set to 0 for deterministic results
+        max_tokens: 512,
+        temperature: 0
     })
 
     const {
         choices: [{ text }]
     } = completionResponse.data
 
-    return text || "Sorry, I don't know how to help with that."
+    if (!text) {
+        return { status: "Sorry, I don't know how to help with that." }
+    }
+
+    let response = {} as EmbeddingResponse
+
+    try {
+        response = { ...JSON.parse(text), status: "success" }
+    } catch (error) {
+        response = { status: "Sorry, I don't know how to help with that." }
+    }
+
+    return response
+}
+
+interface EmbeddingResponse {
+    status: string
+    question?: string
+    answer?: string
 }
 
 export { generateEmbeddings, searchEmbeddings }

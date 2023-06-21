@@ -12,7 +12,7 @@ function BattlecardComponent(props: BattlecardProps) {
                     Detected pain point
                 </p>
                 <div className="bg-[#FEF9C3] w-full rounded-md p-2">
-                    {props.battlecard.painpoint}
+                    {props.battlecard.question}
                 </div>
             </div>
             <div>
@@ -20,7 +20,7 @@ function BattlecardComponent(props: BattlecardProps) {
                     Suggested answer
                 </p>
                 <div className="bg-[#CCFBF1] w-full rounded-md p-2">
-                    {props.battlecard.analysis}
+                    {props.battlecard.answer}
                 </div>
             </div>
         </div>

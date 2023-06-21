@@ -87,6 +87,10 @@ async function PostAnalysisRequestHandler(
         "6490abd1d7c08762406b5f16"
     )
 
+    console.log(result)
+
+    return res.status(200).json(result)
+
     // const option = await Option.findOne({ name: "prompt" }).exec()
     // const prompt =
     //     option?.value ||
@@ -101,11 +105,6 @@ async function PostAnalysisRequestHandler(
     //     res.status(400)
     //     return next(new Error("No result returned by the ml API"))
     // }
-
-    return res.status(200).json({
-        painpoint: deepgramResult,
-        analysis: result
-    })
 }
 
 export default PostAnalysisRequestHandler
