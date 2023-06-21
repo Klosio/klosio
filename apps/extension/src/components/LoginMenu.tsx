@@ -1,6 +1,5 @@
 import { Field, Form, Formik } from "formik"
-import { Link } from "react-router-dom"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 import { supabase } from "~core/supabase"
 import type User from "~types/user.model"
