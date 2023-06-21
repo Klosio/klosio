@@ -1,24 +1,32 @@
+import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type SubmitHandler } from "react-hook-form"
+import { z } from "zod"
+
+import type { Languages } from "~types/languages.model"
+
+const languageFormSchema = z.object({
+    country: z.string().min(2, { message: "Country is required" })
+})
+
+type LanguageForm = z.infer<typeof languageFormSchema>
 
 interface LanguageSelectionProps {
     startRecording: (language: string) => void
 }
 
-const languages = [
+const languages: Languages = [
     { label: "English", code: "en", emoji: "🇬🇧" },
     { label: "French", code: "fr", emoji: "🇫🇷" }
 ]
-
-type LanguageForm = {
-    country: string
-}
 
 function LanguageSelection(props: LanguageSelectionProps) {
     const {
         register,
         handleSubmit,
         formState: { isValid, isSubmitting }
-    } = useForm<LanguageForm>()
+    } = useForm<LanguageForm>({
+        resolver: zodResolver(languageFormSchema)
+    })
 
     const onSubmit: SubmitHandler<LanguageForm> = (data) =>
         startMeeting(data.country)
