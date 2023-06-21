@@ -1,7 +1,7 @@
-import { Configuration, OpenAIApi } from "openai"
 import { EmbeddedPainpoint, Painpoint } from "../types/Painpoint"
 import getEnvVar from "./env"
 import { supabaseClient } from "./supabase"
+import { Configuration, OpenAIApi } from "openai"
 
 const openApiKey = getEnvVar("OPENAI_API_KEY")
 
@@ -128,4 +128,3 @@ interface EmbeddingResponse {
 }
 
 export { generateEmbeddings, searchEmbeddings }
-
