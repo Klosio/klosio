@@ -1,29 +1,33 @@
-import { useEffect } from "react"
+import { createContext, useContext, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
+import { addGetSessionListener } from "~core/session"
 import { supabase } from "~core/supabase"
-
-import "~/style.css"
-
-import AppHeader from "~components/AppHeader"
-import Options from "~components/Options"
-import OptionsUnauthorized from "~components/OptionsUnauthorized"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
 
-import("preline")
-
+const AuthContext = createContext(null)
 const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
-function IndexOptions() {
+interface Auth {
+    userSession: UserSession
+    login: (session: UserSession) => Promise<void>
+    logout: () => Promise<void>
+    updateSession: (session: UserSession) => Promise<void>
+}
+
+export function AuthProvider({ children }) {
     const [userSession, setUserSession] = useStorage<UserSession>({
         key: "user",
         instance: new Storage({
             area: "local"
         })
     })
+
+    const navigate = useNavigate()
 
     const initUserSession = async () => {
         if (!userSession) {
@@ -37,7 +41,9 @@ function IndexOptions() {
                 await setUserSession(null)
                 return
             }
-            await setUserSession({ ...session, user: user })
+            session.user = user
+            await setUserSession(session)
+            addGetSessionListener(session)
         }
     }
 
@@ -76,16 +82,25 @@ function IndexOptions() {
         initUserSession()
     }, [])
 
-    return (
-        <div className="m-2 flex flex-col w-full text-center">
-            <AppHeader />
-            {userSession ? (
-                <Options userSession={userSession} />
-            ) : (
-                <OptionsUnauthorized />
-            )}
-        </div>
-    )
+    const updateSession = async (session: UserSession) => {
+        await setUserSession(session)
+    }
+
+    const login = async (session: UserSession) => {
+        await updateSession(session)
+        navigate("/menu")
+    }
+
+    const logout = async () => {
+        await setUserSession(null)
+        navigate("/", { replace: true })
+    }
+
+    const auth: Auth = { userSession, login, logout, updateSession }
+
+    return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
 }
 
-export default IndexOptions
+export const useAuth = () => {
+    return useContext(AuthContext)
+}

@@ -28,5 +28,8 @@
     "prettier": "^2.8.8",
     "turbo": "^1.9.3",
     "prettier-plugin-organize-imports": "^3.2.2"
+  },
+  "dependencies": {
+    "express-jwt": "^8.4.1"
   }
 }

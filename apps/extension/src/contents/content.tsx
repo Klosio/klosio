@@ -6,6 +6,7 @@ import RecordRTC from "recordrtc"
 
 import Chatbot from "~components/Chatbot"
 import type Battlecard from "~types/battlecard.model"
+import type UserSession from "~types/userSession.model"
 
 import("preline")
 
@@ -26,6 +27,18 @@ const CustomButton = () => {
     const [battlecards, setBattlecards] = useState([])
     const [globalRecorder, setGlobalRecorder] = useState(null)
     const [language, setLanguage] = useState("")
+    const [token, setToken] = useState(null)
+
+    const getToken = async () => {
+        if (token) {
+            return token
+        }
+        const session: UserSession = await chrome.runtime.sendMessage({
+            session: "get"
+        })
+        setToken(session.token)
+        return session.token
+    }
 
     chrome.runtime.onMessage.addListener(async function (
         request,
@@ -54,7 +67,6 @@ const CustomButton = () => {
     })
 
     async function startRecording(language: string) {
-        console.log("Start recording...")
         const audioContext = new AudioContext()
         const displayMediaStream = await navigator.mediaDevices.getDisplayMedia(
             {
@@ -109,7 +121,6 @@ const CustomButton = () => {
     }
 
     function stopRecording() {
-        console.log("Stop recording...")
         globalRecorder?.stopRecording(() => {})
         setGlobalRecorder(null)
         console.dir(battlecards)
@@ -125,6 +136,9 @@ const CustomButton = () => {
             `${serverUri}/api/v1/analysis/${language}`,
             {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${await getToken()}`
+                },
                 body: formData
             }
         ).then((response) => response.json())

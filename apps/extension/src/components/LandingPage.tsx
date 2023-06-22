@@ -1,15 +1,8 @@
-import { Link, Navigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
-import type User from "~types/user.model"
-
-interface LandingProps {
-    user: User
-}
-
-function LandingPage(props: LandingProps) {
+function LandingPage() {
     return (
         <>
-            {props.user && <Navigate to="/menu" />}
             <div className="w-full text-center">
                 <Link
                     to={"/login"}

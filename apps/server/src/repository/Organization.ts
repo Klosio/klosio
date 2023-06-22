@@ -1,12 +1,5 @@
+import organizationSchema from "../db/schema/organizationSchema"
 import mongoose from "mongoose"
-
-const organizationSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    }
-})
 
 const Organization = mongoose.model("Organization", organizationSchema)
 
