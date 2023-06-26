@@ -1,10 +1,12 @@
 import { useEffect, useRef } from "react"
+
 import BattlecardComponent from "~components/Battlecard"
 import type BattlecardResponse from "~types/battlecard.model"
 
 interface ChatbotProps {
     language: string
     battlecards: Array<BattlecardResponse>
+    stopRecording: () => void
 }
 
 function Chatbot(props: ChatbotProps) {
@@ -50,6 +52,7 @@ function Chatbot(props: ChatbotProps) {
             <div className="flex justify-center">
                 <button
                     type="button"
+                    onClick={props.stopRecording}
                     className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-300 text-white bg-klosio-green-300 hover:bg-klosio-green-400 focus:outline-none focus:ring-2 focus:ring-klosio-green-400 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                     Stop
                 </button>
