@@ -1,11 +1,13 @@
+import type UserSession from "~types/userSession.model"
 import { addContentScript, getCurrentTab, isGoogleMeetURL } from "./browser"
 
-async function startRecording(language: string) {
+async function startRecording(language: string, userSession: UserSession) {
     const tab = await getCurrentTab()
     await addContentScript("../contents/content.tsx", tab)
     const response = await chrome.tabs.sendMessage(tab.id, {
         recording: "start",
-        language
+        language,
+        userSession
     })
     if (response.recordingStarted === true) {
         console.log("Started recording.")

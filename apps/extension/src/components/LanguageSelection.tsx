@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { z } from "zod"
+import { useAuth } from "~providers/AuthProvider"
+import type UserSession from "~types/userSession.model"
 
 import type { Languages } from "~types/languages.model"
 
@@ -11,7 +13,7 @@ const languageFormSchema = z.object({
 type LanguageForm = z.infer<typeof languageFormSchema>
 
 interface LanguageSelectionProps {
-    startRecording: (language: string) => void
+    startRecording: (language: string, userSession: UserSession) => void
 }
 
 const languages: Languages = [
@@ -28,11 +30,13 @@ function LanguageSelection(props: LanguageSelectionProps) {
         resolver: zodResolver(languageFormSchema)
     })
 
-    const onSubmit: SubmitHandler<LanguageForm> = (data) =>
-        startMeeting(data.country)
+    const { userSession } = useAuth()
 
-    const startMeeting = (countryCode: string) => {
-        props.startRecording(countryCode)
+    const onSubmit: SubmitHandler<LanguageForm> = (data) =>
+        startMeeting(data.country, userSession)
+
+    const startMeeting = (countryCode: string, userSession: UserSession) => {
+        props.startRecording(countryCode, userSession)
     }
 
     return (

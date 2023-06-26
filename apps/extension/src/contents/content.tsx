@@ -27,18 +27,6 @@ const CustomButton = () => {
     const [battlecards, setBattlecards] = useState<BattlecardResponse[]>([])
     const [globalRecorder, setGlobalRecorder] = useState(null)
     const [language, setLanguage] = useState("")
-    const [token, setToken] = useState(null)
-
-    const getToken = async () => {
-        if (token) {
-            return token
-        }
-        const session: UserSession = await chrome.runtime.sendMessage({
-            session: "get"
-        })
-        setToken(session.token)
-        return session.token
-    }
 
     chrome.runtime.onMessage.addListener(async function (
         request,
@@ -53,7 +41,16 @@ const CustomButton = () => {
         }
         if (request.recording === "start") {
             console.log("Recording started in", request.language)
-            await startRecording(request.language)
+            if (
+                !request.userSession ||
+                !request.userSession.token ||
+                !request.userSession.user ||
+                !request.userSession.user.organization
+            ) {
+                console.error("Missing session info")
+                return
+            }
+            await startRecording(request.language, request.userSession)
             setIsRecording(true)
             setLanguage(request.language)
             sendResponse({ recordingStarted: true })
@@ -66,7 +63,7 @@ const CustomButton = () => {
         }
     })
 
-    async function startRecording(language: string) {
+    async function startRecording(language: string, userSession: UserSession) {
         const audioContext = new AudioContext()
         const displayMediaStream = await navigator.mediaDevices.getDisplayMedia(
             {
@@ -92,10 +89,14 @@ const CustomButton = () => {
         const mediaDest = audioContext.createMediaStreamDestination()
         audioDisplayMedia.connect(mediaDest)
         audioUserMedia.connect(mediaDest)
-        startAudioRecorder(mediaDest.stream, language)
+        startAudioRecorder(mediaDest.stream, language, userSession)
     }
 
-    function startAudioRecorder(stream, language: string) {
+    function startAudioRecorder(
+        stream,
+        language: string,
+        userSession: UserSession
+    ) {
         const audioRecorder = new RecordRTC(stream, {
             type: "audio",
             mimeType: "audio/wav",
@@ -107,7 +108,11 @@ const CustomButton = () => {
                 const file = new File([blob], "filename.wav", {
                     type: "audio/wav"
                 })
-                const battlecard = await getBattlecardAnalysis(file, language)
+                const battlecard = await getBattlecardAnalysis(
+                    file,
+                    language,
+                    userSession
+                )
                 console.log(battlecard)
                 if (
                     (battlecard.status =
@@ -128,16 +133,17 @@ const CustomButton = () => {
 
     async function getBattlecardAnalysis(
         file: File,
-        language: string
+        language: string,
+        userSession: UserSession
     ): Promise<BattlecardResponse> {
         const formData = new FormData()
         formData.append("file", file)
         const battlecard: BattlecardResponse = await fetch(
-            `${serverUri}/api/v1/analysis/${language}`,
+            `${serverUri}/api/v1/analysis/${language}/${userSession.user.organization._id}`,
             {
                 method: "POST",
                 headers: {
-                    Authorization: `Bearer ${await getToken()}`
+                    Authorization: `Bearer ${userSession.token}`
                 },
                 body: formData
             }

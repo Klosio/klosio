@@ -1,4 +1,3 @@
-import Option from "../../../repository/Option"
 import { searchEmbeddings } from "../../../util/embeddings"
 import getEnvVar from "../../../util/env"
 import supportedLanguages from "../../../util/supportedLanguages"
@@ -53,13 +52,17 @@ const deepgramAnalysis = async (
 }
 
 async function PostAnalysisRequestHandler(
-    req: Request<{ language: string }>,
+    req: Request<{ language: string; organizationId: string }>,
     res: Response,
     next: NextFunction
 ) {
     if (!req.params.language || !supportedLanguages.has(req.params.language)) {
         res.status(400)
         return next(new Error("No language specified in request params"))
+    }
+    if (!req.params.organizationId) {
+        res.status(400)
+        return next(new Error("No organization specified in request params"))
     }
     if (!req.file) {
         res.status(400)
@@ -84,7 +87,7 @@ async function PostAnalysisRequestHandler(
 
     const result = await searchEmbeddings(
         deepgramResult,
-        "6490abd1d7c08762406b5f16"
+        req.params.organizationId
     )
 
     console.log(result)

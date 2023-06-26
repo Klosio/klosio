@@ -12,7 +12,7 @@ const storage =
 const upload = multer(storage)
 
 analysisRouter.post(
-    "/:language",
+    "/:language/:organizationId",
     upload.single("file"),
     PostAnalysisRequestHandler
 )
