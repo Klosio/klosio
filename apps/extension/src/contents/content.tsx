@@ -1,37 +1,50 @@
 import overlayText from "data-text:~/contents/overlay.css"
 import prelineText from "data-text:~style.css"
 import type { PlasmoCSConfig } from "plasmo"
-import { useState } from "react"
-import RecordRTC from "recordrtc"
+import { useEffect, useState } from "react"
+import ChatbotSvg from "react:~/assets/svg/chatbot.svg"
 
 import Chatbot from "~components/Chatbot"
+import Landing from "~components/LandingContent"
 import type BattlecardResponse from "~types/battlecard.model"
 import type UserSession from "~types/userSession.model"
 
+import { startRecording, stopRecording } from "./content_recorder"
+
 import("preline")
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
+// PlasmoCSConfig is the configuration object for the content script
 export const config: PlasmoCSConfig = {
     matches: ["https://meet.google.com/*"]
 }
 
+// getStyle is called when the content script is injected
 export const getStyle = () => {
     const style = document.createElement("style")
     style.textContent = overlayText + prelineText
     return style
 }
 
-const CustomButton = () => {
+const PopupButton = () => {
     const [isRecording, setIsRecording] = useState(false)
     const [battlecards, setBattlecards] = useState<BattlecardResponse[]>([])
     const [globalRecorder, setGlobalRecorder] = useState(null)
     const [language, setLanguage] = useState("")
+    const [userSession, setUserSession] = useState<UserSession>(null)
+    const [initialStream, setInitialStream] = useState<Array<MediaStream>>(null)
+    const [displayChatbot, setDisplayChatbot] = useState(false)
 
-    chrome.runtime.onMessage.addListener(async function (
-        request,
-        sender,
-        sendResponse
+    useEffect(() => {
+        chrome.runtime.onMessage.addListener(onMessage)
+        return () => {
+            chrome.runtime.onMessage.removeListener(onMessage)
+        }
+    }, [])
+
+    async function onMessage(
+        request: any,
+        _sender: chrome.runtime.MessageSender,
+        sendResponse: (response?: any) => void
     ) {
         if (request.script === "status") {
             sendResponse({ contentScriptReady: true })
@@ -41,146 +54,80 @@ const CustomButton = () => {
         }
         if (request.recording === "start") {
             console.log("Recording started in", request.language)
+            const { userSession, language } = request
             if (
-                !request.userSession ||
-                !request.userSession.token ||
-                !request.userSession.user ||
-                !request.userSession.user.organization
+                !userSession ||
+                !userSession.token ||
+                !userSession.user ||
+                !userSession.user.organization
             ) {
                 console.error("Missing session info")
                 return
             }
-            await startRecording(request.language, request.userSession)
+            setUserSession(userSession)
+            setLanguage(language)
+            const recording = await startRecording(
+                language,
+                userSession,
+                updateBattlecards
+            )
+            setInitialStream(recording.streams)
+            setGlobalRecorder(recording.recorder)
             setIsRecording(true)
-            setLanguage(request.language)
             sendResponse({ recordingStarted: true })
         }
         if (request.recording === "stop") {
             console.log("Stop recording...")
-            stopRecording()
+            cleanupRecording()
             setIsRecording(false)
             sendResponse({ recordingStopped: true })
         }
-    })
-
-    async function startRecording(language: string, userSession: UserSession) {
-        const audioContext = new AudioContext()
-        const displayMediaStream = await navigator.mediaDevices.getDisplayMedia(
-            {
-                audio: true,
-                video: true,
-                preferCurrentTab: true
-            } as DisplayMediaStreamOptions
-        )
-        const userMediaStream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                deviceId: {
-                    deviceId: "default"
-                } as ConstrainDOMString,
-                echoCancellation: false,
-                autoGainControl: false,
-                noiseCancellation: false
-            } as MediaTrackConstraints
-        })
-        const audioDisplayMedia =
-            audioContext.createMediaStreamSource(displayMediaStream)
-        const audioUserMedia =
-            audioContext.createMediaStreamSource(userMediaStream)
-        const mediaDest = audioContext.createMediaStreamDestination()
-        audioDisplayMedia.connect(mediaDest)
-        audioUserMedia.connect(mediaDest)
-        startAudioRecorder(mediaDest.stream, language, userSession)
     }
 
-    function startAudioRecorder(
-        stream,
-        language: string,
-        userSession: UserSession
-    ) {
-        const audioRecorder = new RecordRTC(stream, {
-            type: "audio",
-            mimeType: "audio/wav",
-            recorderType: RecordRTC.StereoAudioRecorder,
-            numberOfAudioChannels: 1,
-            timeSlice: 10000,
-            desiredSampRate: 16000,
-            ondataavailable: async (blob: BlobPart) => {
-                const file = new File([blob], "filename.wav", {
-                    type: "audio/wav"
-                })
-                const battlecard = await getBattlecardAnalysis(
-                    file,
-                    language,
-                    userSession
-                )
-                console.log(battlecard)
-                if (
-                    (battlecard.status =
-                        "success" && battlecard.question && battlecard.answer)
-                )
-                    setBattlecards((b) => [...b, battlecard])
-            }
-        })
-        audioRecorder.startRecording()
-        setGlobalRecorder(audioRecorder)
+    const updateBattlecards = (battlecard: BattlecardResponse) => {
+        setBattlecards((b) => [...b, battlecard])
     }
 
-    function stopRecording() {
-        globalRecorder?.stopRecording(() => {})
+    const cleanupRecording = () => {
+        stopRecording(globalRecorder, initialStream)
         setGlobalRecorder(null)
-        console.dir(battlecards)
+        setIsRecording(false)
+        setDisplayChatbot(false)
     }
 
-    async function getBattlecardAnalysis(
-        file: File,
-        language: string,
-        userSession: UserSession
-    ): Promise<BattlecardResponse> {
-        const formData = new FormData()
-        formData.append("file", file)
-        const battlecard: BattlecardResponse = await fetch(
-            `${serverUri}/api/v1/analysis/${language}/${userSession.user.organization._id}`,
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: formData
-            }
-        ).then((response) => response.json())
-        return battlecard
+    const DisplayLandingOrChatbot = (props: {
+        isSession: boolean
+        isRecording: boolean
+    }) => {
+        return props.isSession && props.isRecording ? (
+            <Chatbot
+                {...{
+                    language,
+                    battlecards,
+                    stopRecording: cleanupRecording
+                }}
+            />
+        ) : (
+            <Landing />
+        )
     }
-
-    const [displayChatbot, setDisplayChatbot] = useState(false)
-
     return (
         <div className="flex flex-col items-end">
-            {displayChatbot && <Chatbot {...{ language, battlecards }} />}
+            {displayChatbot && (
+                <DisplayLandingOrChatbot
+                    {...{
+                        isSession: !!userSession,
+                        isRecording
+                    }}
+                />
+            )}
             <button onClick={() => setDisplayChatbot(!displayChatbot)}>
                 <span className="m-1 inline-flex justify-center items-center w-[46px] h-[46px] rounded-md bg-klosio-blue-600 text-white">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.75"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round">
-                        <path
-                            stroke="none"
-                            d="M0 0h24v24H0z"
-                            fill="none"></path>
-                        <path d="M4 21v-13a3 3 0 0 1 3 -3h10a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-9l-4 4"></path>
-                        <path d="M9.5 9h.01"></path>
-                        <path d="M14.5 9h.01"></path>
-                        <path d="M9.5 13a3.5 3.5 0 0 0 5 0"></path>
-                    </svg>
+                    <ChatbotSvg />
                 </span>
             </button>
         </div>
     )
 }
 
-export default CustomButton
+export default PopupButton
