@@ -1,6 +1,6 @@
+import { painpointRepository } from "../repository/painpointRepository"
 import { EmbeddedPainpoint, Painpoint } from "../types/Painpoint"
 import getEnvVar from "./env"
-import { supabaseClient } from "./supabase"
 import { Configuration, OpenAIApi } from "openai"
 
 const openApiKey = getEnvVar("OPENAI_API_KEY")
@@ -32,17 +32,9 @@ async function generateEmbeddings(
     return await Promise.all(embeddedPainpoint)
 }
 
-async function getEmbeddings(organization_id: string): Promise<Painpoint[]> {
-    const { data } = await supabaseClient
-        .from("painpoints")
-        .select("painpoint, answer")
-        .eq("organization_id", organization_id)
-    return data as Painpoint[]
-}
-
 async function searchEmbeddings(
     question: string,
-    organization_id: string
+    organizationId: string
 ): Promise<EmbeddingResponse> {
     // OpenAI recommends replacing newlines with spaces for best results
     const input = question.replace(/\n/g, " ")
@@ -59,23 +51,15 @@ async function searchEmbeddings(
     const [{ embedding }] = embeddingResponse.data.data
 
     // In production we should handle possible errors
-    const { data: documents, error } = await supabaseClient.rpc(
-        "match_painpoints",
-        {
-            query_embedding: embedding,
-            match_threshold: 0.78, // Choose an appropriate threshold for your data
-            match_count: 3, // Choose the number of matches
-            organization_id
-        }
-    )
+    const embeddedPainpoints = await painpointRepository
+        .findByMatchingEmbedding(embedding, organizationId)
+        .catch((error) => console.error(error))
 
-    if (!documents) {
+    if (!embeddedPainpoints) {
         return { status: "Sorry, I don't know how to help with that." }
     }
 
-    console.log(error)
-
-    const painpoints = (documents as Painpoint[]).map(
+    const painpoints = embeddedPainpoints.map(
         (document) =>
             `Painpoint: ${document.painpoint}\nAnswer: ${document.answer}\n`
     )

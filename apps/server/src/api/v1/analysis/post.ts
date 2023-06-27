@@ -73,7 +73,7 @@ async function PostAnalysisRequestHandler(
         req.file.buffer,
         req.params.language
     ).catch((err) => {
-        console.log(err)
+        console.error(err)
         res.status(400)
         return next(new Error("Error when calling the transcription API"))
     })
@@ -94,7 +94,7 @@ async function PostAnalysisRequestHandler(
 
     return res.status(200).json(result)
 
-    // const option = await Option.findOne({ name: "prompt" }).exec()
+    // const option = await optionRepository.findByName("prompt")
     // const prompt =
     //     option?.value ||
     //     "En tant que vendeur dans l'industrie SAAS. Résume le contenu de la transcription de l'appel ci-dessus en mettant l'accent sur le problème ressenti par le client potentiel. La transcription du commercial et du client sont melanges. Il faut donc bien faire attention a ce que le resumé soit coherent."

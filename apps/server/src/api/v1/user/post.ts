@@ -1,4 +1,5 @@
-import User from "../../../repository/User"
+import { userRepository } from "../../../repository/userRepository"
+import User from "../../../types/User"
 import { NextFunction, Request, Response } from "express"
 
 async function PostUserRequestHandler(
@@ -6,22 +7,23 @@ async function PostUserRequestHandler(
     res: Response,
     next: NextFunction
 ) {
-    if (!req.body.email || !req.body.authId) {
+    const { email, authId } = req.body
+    if (!email || !authId) {
         res.status(400)
         return next(new Error("No email or authId specified in body params"))
     }
-    const user = new User({
-        email: req.body.email,
-        auth_id: req.body.authId
-    })
-    try {
-        await user.save()
-    } catch (err) {
-        console.log(err)
-        res.status(500)
-        return next(new Error(`Error when saving user ${user.email}`))
+    const user: Omit<User, "id"> = {
+        email: email,
+        auth_id: authId
     }
-    return res.status(201).json(user.toJSON())
+    try {
+        const createdUser = await userRepository.create(user)
+        return res.status(201).json(createdUser)
+    } catch (err) {
+        console.error(err)
+        res.status(500)
+        return next(err)
+    }
 }
 
 export default PostUserRequestHandler

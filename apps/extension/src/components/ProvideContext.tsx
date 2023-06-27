@@ -36,7 +36,7 @@ function ProvideContext() {
         const formData = new FormData()
         formData.append("file", csvFile)
         return await fetch(
-            `${serverUri}/api/v1/organizations/${organization._id}/painpoints`,
+            `${serverUri}/api/v1/organizations/${organization.id}/painpoints`,
             {
                 method: "POST",
                 headers: {

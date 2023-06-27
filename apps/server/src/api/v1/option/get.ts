@@ -1,4 +1,4 @@
-import Option from "../../../repository/Option"
+import { optionRepository } from "../../../repository/optionRepository"
 import { NextFunction, Request, Response } from "express"
 
 async function GetOptionRequestHandler(
@@ -6,18 +6,25 @@ async function GetOptionRequestHandler(
     res: Response,
     next: NextFunction
 ) {
-    if (!req.params.name) {
+    const { name } = req.params
+    if (!name) {
         res.status(400)
         return next(new Error("No name specified for option"))
     }
 
-    const option = await Option.findOne({ name: req.params.name }).exec()
-    if (!option) {
-        res.status(404)
-        return next(new Error(`No option found with name ${req.params.name}`))
-    }
+    try {
+        const option = await optionRepository.findByName(name)
+        if (!option) {
+            res.status(404)
+            return next(new Error(`No option found with name ${name}`))
+        }
 
-    return res.status(200).json(option)
+        return res.status(200).json(option)
+    } catch (err) {
+        console.error(err)
+        res.status(500)
+        return next(err)
+    }
 }
 
 export default GetOptionRequestHandler

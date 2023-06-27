@@ -1,5 +1,6 @@
-import Organization from "../../../repository/Organization"
-import User from "../../../repository/User"
+import { organizationRepository } from "../../../repository/organizationRepository"
+import { userRepository } from "../../../repository/userRepository"
+import Organization from "../../../types/Organization"
 import { NextFunction, Request, Response } from "express"
 
 async function PostOrganizationRequestHandler(
@@ -7,41 +8,27 @@ async function PostOrganizationRequestHandler(
     res: Response,
     next: NextFunction
 ) {
-    const user = req.body.user
-    if (!req.body.name || !user) {
+    const { user, name } = req.body
+    if (!name || !user) {
         res.status(400)
         return next(new Error("No name or user specified in body params"))
     }
 
-    const organization = new Organization({
-        name: req.body.name,
-        user: user
-    })
-    try {
-        await organization.save()
-    } catch (err) {
-        console.log(err)
-        res.status(500)
-        return next(
-            new Error(`Error when saving organization ${organization.name}`)
-        )
-    }
-    try {
-        await User.updateOne(
-            { _id: user._id },
-            { $set: { organization: organization } }
-        )
-    } catch (err) {
-        console.log(err)
-        res.status(500)
-        return next(
-            new Error(
-                `Error when saving organization ${organization.name} for user ${user.email}`
-            )
-        )
+    const organization: Omit<Organization, "id"> = {
+        name: name
     }
 
-    return res.status(201).json(organization.toJSON())
+    try {
+        const createdOrganization = await organizationRepository.create(
+            organization
+        )
+        await userRepository.updateOrganization(user, createdOrganization)
+        return res.status(201).json(organization)
+    } catch (err) {
+        console.error(err)
+        res.status(500)
+        return next(err)
+    }
 }
 
 export default PostOrganizationRequestHandler
