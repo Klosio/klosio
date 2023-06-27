@@ -100,7 +100,7 @@ async function getBattlecardAnalysis(
     const formData = new FormData()
     formData.append("file", file)
     const battlecard: BattlecardResponse = await fetch(
-        `${serverUri}/api/v1/analysis/${language}/${userSession.user.organization._id}`,
+        `${serverUri}/api/v1/analysis/${language}/${userSession.user.organization.id}`,
         {
             method: "POST",
             headers: {

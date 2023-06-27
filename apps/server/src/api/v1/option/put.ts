@@ -1,4 +1,4 @@
-import Option from "../../../repository/Option"
+import { optionRepository } from "../../../repository/optionRepository"
 import { NextFunction, Request, Response } from "express"
 
 async function PutOptionRequestHandler(
@@ -6,37 +6,36 @@ async function PutOptionRequestHandler(
     res: Response,
     next: NextFunction
 ) {
-    if (!req.params.name) {
+    const { name } = req.params
+    if (!name) {
         res.status(400)
         return next(new Error("No name specified for option"))
     }
 
     let existing = true
-    let option = await Option.findOne({ name: req.params.name }).exec()
-    if (!option) {
-        existing = false
-        option = new Option({
-            name: req.params.name
-        })
-    }
-
-    option.value = req.body.value
-
     try {
-        await option.save()
+        let option = await optionRepository.findByName(name)
+
+        if (!option) {
+            existing = false
+            option = {
+                name: name
+            }
+        }
+
+        option.value = req.body.value
+
+        const savedOption = await optionRepository.save(option)
+
+        if (!existing) {
+            return res.status(201).json(savedOption)
+        }
+        return res.status(200).json(savedOption)
     } catch (err) {
-        console.log(err)
+        console.error(err)
         res.status(500)
-        return next(
-            new Error(
-                `Error when saving ${option.name} option with value ${option.value}`
-            )
-        )
+        return next(err)
     }
-    if (!existing) {
-        return res.sendStatus(201)
-    }
-    return res.sendStatus(204)
 }
 
 export default PutOptionRequestHandler

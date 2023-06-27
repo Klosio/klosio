@@ -1,4 +1,4 @@
-import User from "../../../repository/User"
+import { userRepository } from "../../../repository/userRepository"
 import { NextFunction, Request, Response } from "express"
 
 async function GetUserRequestHandler(
@@ -6,20 +6,25 @@ async function GetUserRequestHandler(
     res: Response,
     next: NextFunction
 ) {
-    if (!req.params.authId) {
+    const { authId } = req.params
+    if (!authId) {
         res.status(400)
         return next(new Error("No authId specified for user"))
     }
 
-    const user = await User.findOne({ auth_id: req.params.authId })
-        .populate("organization")
-        .exec()
-    if (!user) {
-        res.status(404)
-        return next(new Error(`No user found with authId ${req.params.authId}`))
-    }
+    try {
+        const user = await userRepository.findByAuthId(authId)
+        if (!user) {
+            res.status(404)
+            return next(new Error(`No user found with authId ${authId}`))
+        }
 
-    return res.status(200).json(user.toJSON())
+        return res.status(200).json(user)
+    } catch (err) {
+        console.error(err)
+        res.status(500)
+        return next(err)
+    }
 }
 
 export default GetUserRequestHandler

@@ -1,5 +1,5 @@
+import { painpointRepository } from "../../../../repository/painpointRepository"
 import { generateEmbeddings } from "../../../../util/embeddings"
-import { supabaseClient } from "../../../../util/supabase"
 import { NextFunction, Request, Response } from "express"
 import { parse } from "papaparse"
 import { z } from "zod"
@@ -63,18 +63,16 @@ async function PostPainpointsRequestHandler(
 
     const embeddings = await generateEmbeddings(data, organizationId)
 
-    const { error } = await supabaseClient
-        .from("painpoints")
-        .delete()
-        .eq("organization_id", organizationId)
-        .then(() => supabaseClient.from("painpoints").insert(embeddings))
-
-    if (error) {
+    try {
+        await painpointRepository.deleteByOrganizationId(organizationId)
+        await painpointRepository.create(embeddings)
+    } catch (err) {
+        console.error(err)
         res.status(500)
-        return next(new Error("Error inserting painpoints"))
+        return next(err)
     }
 
-    return res.sendStatus(200)
+    return res.sendStatus(201)
 }
 
 export default PostPainpointsRequestHandler

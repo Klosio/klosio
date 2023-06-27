@@ -1,7 +1,8 @@
-import type Organization from "./organization.model"
+import Organization from "./Organization"
 
 export default interface User {
     id: string
+    auth_id?: string
     email: string
     organization?: Organization
 }
