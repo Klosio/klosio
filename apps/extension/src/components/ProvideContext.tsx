@@ -73,7 +73,7 @@ function ProvideContext() {
                         <Form>
                             <div className="flex flex-col space-y-2 items-center">
                                 <Field name="industry">
-                                    {({ field, form, meta }) => (
+                                    {({ field, meta }) => (
                                         <div className="w-full">
                                             <label
                                                 htmlFor="industry"
