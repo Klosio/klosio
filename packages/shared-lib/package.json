@@ -1,0 +1,11 @@
+{
+  "name": "shared-lib",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "devDependencies": {
+    "typescript": "5.1.5"
+  },
+  "dependencies": {
+    "zod": "^3.21.4"
+  }
+}

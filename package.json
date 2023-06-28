@@ -7,8 +7,11 @@
     "packages/*"
   ],
   "scripts": {
+    "start:server:prod": "node apps/server/dist/index.js",
     "build": "turbo run build",
     "build:extension": "turbo build --filter=extension",
+    "build:server": "turbo build --filter=server",
+    "docker": "turbo prune --scope='server' --docker",
     "package:extension": "turbo package --filter=extension",
     "dev": "turbo run dev --parallel",
     "test": "turbo run test",
