@@ -2,6 +2,7 @@ import overlayText from "data-text:~/contents/overlay.css"
 import prelineText from "data-text:~style.css"
 import type { PlasmoCSConfig } from "plasmo"
 import { useEffect, useState } from "react"
+import Draggable from "react-draggable"
 import ChatbotSvg from "react:~/assets/svg/chatbot.svg"
 
 import Chatbot from "~components/Chatbot"
@@ -112,21 +113,27 @@ const PopupButton = () => {
         )
     }
     return (
-        <div className="flex flex-col items-end">
-            {displayChatbot && (
-                <DisplayLandingOrChatbot
-                    {...{
-                        isSession: !!userSession,
-                        isRecording
-                    }}
-                />
-            )}
-            <button onClick={() => setDisplayChatbot(!displayChatbot)}>
-                <span className="m-1 inline-flex justify-center items-center w-[46px] h-[46px] rounded-md bg-klosio-blue-600 text-white">
-                    <ChatbotSvg />
-                </span>
-            </button>
-        </div>
+        <Draggable
+            axis="x"
+            grid={[10, 10]}
+            bounds={{ top: 0, left: -100, right: 0, bottom: 0 }}>
+            <div className="flex flex-col items-end">
+                {displayChatbot && (
+                    <DisplayLandingOrChatbot
+                        {...{
+                            isSession: !!userSession,
+                            isRecording
+                        }}
+                    />
+                )}
+
+                <button onClick={() => setDisplayChatbot(!displayChatbot)}>
+                    <span className="m-1 inline-flex justify-center items-center w-[42px] h-[42px] rounded-md bg-klosio-blue-600 text-white hover:text-klosio-blue-200">
+                        <ChatbotSvg />
+                    </span>
+                </button>
+            </div>
+        </Draggable>
     )
 }
 
