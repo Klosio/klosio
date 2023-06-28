@@ -43,4 +43,4 @@ function isRecordingAllowed(tab: chrome.tabs.Tab): boolean {
     return isGoogleMeetURL(tab?.url)
 }
 
-export { startRecording, stopRecording, isRecording, isRecordingAllowed }
+export { isRecording, isRecordingAllowed, startRecording, stopRecording }

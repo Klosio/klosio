@@ -34,55 +34,62 @@ const PopupButton = () => {
     const [userSession, setUserSession] = useState<UserSession>(null)
     const [initialStream, setInitialStream] = useState<Array<MediaStream>>(null)
     const [displayChatbot, setDisplayChatbot] = useState(false)
+    const [destroyListener, setDestroyListener] = useState(false)
 
     useEffect(() => {
+        const onMessage = closure()
         chrome.runtime.onMessage.addListener(onMessage)
-        return () => {
-            chrome.runtime.onMessage.removeListener(onMessage)
-        }
-    }, [])
+        return () => chrome.runtime.onMessage.removeListener(onMessage)
+    }, [destroyListener, setDestroyListener])
 
-    async function onMessage(
-        request: any,
-        _sender: chrome.runtime.MessageSender,
-        sendResponse: (response?: any) => void
-    ) {
-        if (request.script === "status") {
-            sendResponse({ contentScriptReady: true })
-        }
-        if (request.script === "recording") {
-            sendResponse({ contentScriptRecording: isRecording })
-        }
-        if (request.recording === "start") {
-            console.log("Recording started in", request.language)
-            const { userSession, language } = request
-            if (
-                !userSession ||
-                !userSession.token ||
-                !userSession.user ||
-                !userSession.user.organization
-            ) {
-                console.error("Missing session info")
-                return
+    function closure() {
+        let isRecording = false
+        async function onMessage(
+            request: any,
+            _sender: chrome.runtime.MessageSender,
+            sendResponse: (response?: any) => void
+        ) {
+            if (request.script === "status") {
+                sendResponse({ contentScriptReady: true })
             }
-            setUserSession(userSession)
-            setLanguage(language)
-            const recording = await startRecording(
-                language,
-                userSession,
-                updateBattlecards
-            )
-            setInitialStream(recording.streams)
-            setGlobalRecorder(recording.recorder)
-            setIsRecording(true)
-            sendResponse({ recordingStarted: true })
+            if (request.script === "recording") {
+                console.log("Currently recording", isRecording)
+                sendResponse({ contentScriptRecording: isRecording })
+            }
+            if (request.recording === "start") {
+                console.log("Recording started in", request.language)
+                const { userSession, language } = request
+                if (
+                    !userSession ||
+                    !userSession.token ||
+                    !userSession.user ||
+                    !userSession.user.organization
+                ) {
+                    console.error("Missing session info")
+                    return
+                }
+                setUserSession(userSession)
+                setLanguage(language)
+                const recording = await startRecording(
+                    language,
+                    userSession,
+                    updateBattlecards
+                )
+                setInitialStream(recording.streams)
+                setGlobalRecorder(recording.recorder)
+                setIsRecording(true)
+                isRecording = true
+                sendResponse({ recordingStarted: true })
+            }
+            if (request.recording === "stop") {
+                console.log("Stop recording...")
+                cleanupRecording()
+                setIsRecording(false)
+                isRecording = false
+                sendResponse({ recordingStopped: true })
+            }
         }
-        if (request.recording === "stop") {
-            console.log("Stop recording...")
-            cleanupRecording()
-            setIsRecording(false)
-            sendResponse({ recordingStopped: true })
-        }
+        return onMessage
     }
 
     const updateBattlecards = (battlecard: BattlecardResponse) => {
@@ -94,6 +101,7 @@ const PopupButton = () => {
         setGlobalRecorder(null)
         setIsRecording(false)
         setDisplayChatbot(false)
+        setDestroyListener(!destroyListener)
     }
 
     const DisplayLandingOrChatbot = (props: {
