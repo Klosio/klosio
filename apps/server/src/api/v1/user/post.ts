@@ -1,3 +1,4 @@
+import { organizationRepository } from "../../../repository/organizationRepository"
 import { userRepository } from "../../../repository/userRepository"
 import User from "../../../types/User"
 import { NextFunction, Request, Response } from "express"
@@ -16,8 +17,16 @@ async function PostUserRequestHandler(
         email: email,
         auth_id: authId
     }
+    const domain = email.match(new RegExp(/.*@(\S+)/))[1]
     try {
-        const createdUser = await userRepository.create(user)
+        let createdUser = await userRepository.create(user)
+        const organization = await organizationRepository.searchDomain(domain)
+        if (!!organization) {
+            createdUser = await userRepository.updateOrganization(
+                createdUser,
+                organization
+            )
+        }
         return res.status(201).json(createdUser)
     } catch (err) {
         console.error(err)

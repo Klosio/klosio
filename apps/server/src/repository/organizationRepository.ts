@@ -5,6 +5,8 @@ import { v4 as uuid } from "uuid"
 interface OrganizationRepository {
     find(id: string): Promise<Organization>
     create(organization: Omit<Organization, "id">): Promise<Organization>
+    searchDomain(domain: string): Promise<Organization>
+    saveDomain(organization: Organization, domain: string): Promise<void>
 }
 
 const organizationRepository: OrganizationRepository = {
@@ -39,6 +41,39 @@ const organizationRepository: OrganizationRepository = {
             )
         }
         return data
+    },
+    async searchDomain(domain: string): Promise<Organization> {
+        const { data, error } = await supabaseClient
+            .from("organizations")
+            .select("id, name, domain")
+            .eq("domain", domain)
+            .single()
+
+        if (error) {
+            throw new Error(
+                `Error when retrieving organization with domain ${domain}`,
+                { cause: error }
+            )
+        }
+        return data
+    },
+    async saveDomain(
+        organization: Organization,
+        domain: string
+    ): Promise<void> {
+        console.log(organization.id, domain)
+        const { data, error } = await supabaseClient
+            .from("organizations")
+            .update({ domain: domain })
+            .eq("id", organization.id)
+            .select()
+
+        if (error) {
+            throw new Error(
+                `Error when save domain for organization with id ${organization.id}`,
+                { cause: error }
+            )
+        }
     }
 }
 

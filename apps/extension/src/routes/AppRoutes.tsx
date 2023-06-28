@@ -1,5 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 
+import DomainManagement from "~components/DomainManagement"
+import EmailManagement from "~components/EmailManagement"
 import LandingPage from "~components/LandingPage"
 import LanguageSelection from "~components/LanguageSelection"
 import LoginMenu from "~components/LoginMenu"
@@ -73,6 +75,22 @@ function AppRoutes(props: AppRoutesProps) {
                 element={
                     <RouteGuard isAccessible={isUserLoggedIn}>
                         <OrganizationCreation />
+                    </RouteGuard>
+                }
+            />
+            <Route
+                path="/domainManagement"
+                element={
+                    <RouteGuard isAccessible={isUserLoggedIn}>
+                        <DomainManagement />
+                    </RouteGuard>
+                }
+            />
+            <Route
+                path="/emailManagement"
+                element={
+                    <RouteGuard isAccessible={isUserLoggedIn}>
+                        <EmailManagement />
                     </RouteGuard>
                 }
             />

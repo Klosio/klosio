@@ -52,7 +52,7 @@ const userRepository: UserRepository = {
             .from("users")
             .update({ organization_id: organization.id })
             .eq("id", user.id)
-            .select()
+            .select("id, email, auth_id, organizations ( name )")
             .single()
 
         if (error) {
@@ -60,7 +60,13 @@ const userRepository: UserRepository = {
                 cause: error
             })
         }
-        return data
+
+        const refinedData = Object.fromEntries(
+            Object.entries(data).map(([k, v]) =>
+                k !== "organizations" ? [k, v] : ["organization", v]
+            )
+        ) as User
+        return refinedData
     }
 }
 

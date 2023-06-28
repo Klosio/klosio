@@ -43,6 +43,11 @@ function Menu(props: MenuProps) {
                         Start a meeting
                     </button>
                     <button
+                        onClick={() => navigate("/domainManagement")}
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-klosio-green-100 border border-transparent font-semibold text-klosio-green-300 hover:bg-klosio-green-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                        Manage users
+                    </button>
+                    <button
                         onClick={() => navigate("/provideContext")}
                         className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md bg-klosio-green-100 border border-transparent font-semibold text-klosio-green-300 hover:bg-klosio-green-100 focus:outline-none focus:ring-2 ring-offset-white focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                         Provide Context
