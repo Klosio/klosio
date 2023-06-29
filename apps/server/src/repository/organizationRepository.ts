@@ -47,7 +47,6 @@ const organizationRepository: OrganizationRepository = {
             .from("organizations")
             .select("id, name, domain")
             .eq("domain", domain)
-            .single()
 
         if (error) {
             throw new Error(
@@ -55,7 +54,8 @@ const organizationRepository: OrganizationRepository = {
                 { cause: error }
             )
         }
-        return data
+
+        return data[0]
     },
     async saveDomain(
         organization: Organization,
