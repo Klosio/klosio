@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { Link } from "react-router-dom"
+import InfoSvg from "react:~/assets/svg/info.svg"
 import { z } from "zod"
 
 import { supabase } from "~core/supabase"
@@ -113,7 +114,7 @@ function DomainManagement() {
                 to only a few users?
             </p>
             <Link
-                to={"/manageEmails"}
+                to={"/emailManagement"}
                 className="font-bold text-klosio-green-300 hover:text-klosio-green-600 focus:outline-none focus:ring-2 ring-offset-white focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm">
                 Switch to email detection
             </Link>
@@ -132,30 +133,11 @@ function DomainManagement() {
                         {...register("domain", { required: true })}
                         className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
                         placeholder="mydomain.com"
-                        required
                     />
                 </div>
                 <div className="w-full flex flex-row items-center space-x-1">
                     <div>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="text-klosio-yellow-400 h-[20px] w-[20px]"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.75"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round">
-                            <path
-                                stroke="none"
-                                d="M0 0h24v24H0z"
-                                fill="none"></path>
-                            <path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0"></path>
-                            <path d="M12 9h.01"></path>
-                            <path d="M11 12h1v4h1"></path>
-                        </svg>
+                        <InfoSvg className="text-klosio-yellow-400 h-[20px] w-[20px]" />
                     </div>
                     <div className="w-full">
                         <p className="text-xs text-klosio-yellow-400">

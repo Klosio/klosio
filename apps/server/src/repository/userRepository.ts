@@ -6,7 +6,7 @@ import { v4 as uuid } from "uuid"
 interface UserRepository {
     findByAuthId(authId: string): Promise<User>
     create(user: Omit<User, "id">): Promise<User>
-    updateOrganization(user: User, organization: Organization): Promise<User>
+    updateOrganization(user: User, organization_id: string): Promise<User>
 }
 
 const userRepository: UserRepository = {
@@ -46,11 +46,11 @@ const userRepository: UserRepository = {
     },
     async updateOrganization(
         user: User,
-        organization: Organization
+        organization_id: string
     ): Promise<User> {
         const { data, error } = await supabaseClient
             .from("users")
-            .update({ organization_id: organization.id })
+            .update({ organization_id })
             .eq("id", user.id)
             .select("id, email, auth_id, organizations ( name )")
             .single()
