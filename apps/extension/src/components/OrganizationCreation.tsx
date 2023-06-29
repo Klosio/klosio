@@ -32,10 +32,7 @@ function OrganizationCreation() {
 
     const onSubmit: SubmitHandler<OrganizationCreationForm> = async (
         data: OrganizationCreationForm
-    ) => {
-        alert(JSON.stringify(data))
-        await submitOrganizationCreation(data)
-    }
+    ) => await submitOrganizationCreation(data)
 
     const submitOrganizationCreation = async (
         form: OrganizationCreationForm
@@ -60,7 +57,7 @@ function OrganizationCreation() {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${userSession.token}`
             },
-            body: JSON.stringify(form)
+            body: JSON.stringify({ ...form, user: userSession.user })
         })
         if (!response.ok) {
             console.error("Error when saving organization")
