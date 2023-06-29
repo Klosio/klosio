@@ -93,21 +93,6 @@ async function PostAnalysisRequestHandler(
     console.log(result)
 
     return res.status(200).json(result)
-
-    // const option = await optionRepository.findByName("prompt")
-    // const prompt =
-    //     option?.value ||
-    //     "En tant que vendeur dans l'industrie SAAS. Résume le contenu de la transcription de l'appel ci-dessus en mettant l'accent sur le problème ressenti par le client potentiel. La transcription du commercial et du client sont melanges. Il faut donc bien faire attention a ce que le resumé soit coherent."
-    // const gptresult = await gptAnalysis(prompt, deepgramResult).catch((err) => {
-    //     console.log(err)
-    //     res.status(400)
-    //     return next(new Error("Error when calling the ml API"))
-    // })
-
-    // if (!gptresult) {
-    //     res.status(400)
-    //     return next(new Error("No result returned by the ml API"))
-    // }
 }
 
 export default PostAnalysisRequestHandler

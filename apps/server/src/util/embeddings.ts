@@ -1,6 +1,9 @@
+import { businessContextRepository } from "../repository/businessContextRepository"
+import { optionRepository } from "../repository/optionRepository"
 import { painpointRepository } from "../repository/painpointRepository"
 import { EmbeddedPainpoint, Painpoint } from "../types/Painpoint"
 import getEnvVar from "./env"
+import { PromptVariables, getPrompt } from "./prompt"
 import { Configuration, OpenAIApi } from "openai"
 
 const openApiKey = getEnvVar("OPENAI_API_KEY")
@@ -51,34 +54,55 @@ async function searchEmbeddings(
     const [{ embedding }] = embeddingResponse.data.data
 
     // In production we should handle possible errors
-    const embeddedPainpoints = await painpointRepository
-        .findByMatchingEmbedding(embedding, organizationId)
-        .catch((error) => console.error(error))
+    const embeddedPainpointsPromise =
+        painpointRepository.findByMatchingEmbedding(embedding, organizationId)
+    const businessContextsPromise =
+        businessContextRepository.findByOrganization(organizationId)
+    const optionPromise = optionRepository.findByName("prompt")
+    const results = await Promise.all([
+        embeddedPainpointsPromise,
+        businessContextsPromise,
+        optionPromise
+    ]).catch((error) => console.error(error))
 
-    if (!embeddedPainpoints) {
+    if (!results) {
+        return { status: "Sorry, I don't know how to help with that." }
+    }
+    const [embeddedPainpoints, businessContexts, option] = results
+
+    if (!businessContexts || !businessContexts.length) {
+        console.error(
+            `Business context for organization ${organizationId} not found`
+        )
         return { status: "Sorry, I don't know how to help with that." }
     }
 
-    const painpoints = embeddedPainpoints.map(
-        (document) =>
-            `Painpoint: ${document.painpoint}\nAnswer: ${document.answer}\n`
-    )
+    if (!embeddedPainpoints || !embeddedPainpoints.length) {
+        console.log(`no pain points for ${organizationId}`)
+        return { status: "Sorry, I don't know how to help with that." }
+    }
 
-    const prompt = `
-    "Suivant la question posée, voici les réponses que tu pourrais donner à ton client :
+    if (businessContexts.length > 1) {
+        console.error(
+            `Multiple business contexts per organization not supported for now, taking the first found for organization ${organizationId}`
+        )
+    }
 
-    Question :
-    ${question}
-    
-    Réponses possibles :
-    ${painpoints}
-    
-    Réponds à ton client en fonction de ces réponses exclusivement. Si tu n'a pas suffisament d'information dans la question ou ne sais pas quoi répondre, ne repond rien.
-    Retourne les réponses que tu as données à ton client, ainsi que le pain point que tu as utilisé reformulé sous forme d'une question simple.
-    
-    Renvoie la réponse dans un format JSON avec les clés 'question' et 'answer'. Si tu n'as pas répondu à la question, renvoie une réponse vide."
-    `
+    const painpoints = embeddedPainpoints
+        .map(
+            (document: { painpoint: any; answer: any }) =>
+                `Painpoint: ${document.painpoint}\nAnswer: ${document.answer}\n`
+        )
+        .join("")
 
+    const variables: PromptVariables = {
+        ...businessContexts[0],
+        question,
+        painpoints
+    }
+
+    const prompt = getPrompt(option?.value, variables)
+    console.log(prompt)
     const completionResponse = await openai.createCompletion({
         model: "text-davinci-003",
         prompt,

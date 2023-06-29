@@ -5,10 +5,7 @@ import { useAuth } from "~providers/AuthProvider"
 import type UserSession from "~types/userSession.model"
 
 import type { Languages } from "~types/languages.model"
-
-const languageFormSchema = z.object({
-    country: z.string().min(2, { message: "Country is required" })
-})
+import { languageFormSchema } from "~validation/languageForm.schema"
 
 type LanguageForm = z.infer<typeof languageFormSchema>
 
