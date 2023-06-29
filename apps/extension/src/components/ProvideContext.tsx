@@ -3,6 +3,8 @@ import csvFileTemplate from "raw:~/assets/painpoints-template.csv"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
+import InfoSvg from "react:~/assets/svg/info.svg"
+import WarningSvg from "react:~/assets/svg/warning.svg"
 import { type z } from "zod"
 
 import { useAuth } from "~providers/AuthProvider"
@@ -18,6 +20,7 @@ type BusinessContextForm = z.infer<typeof businessContextFormSchema>
 
 function ProvideContext() {
     const [csvFile, setCsvFile] = useState<File>(null)
+    const [uploadError, setUploadError] = useState(false)
     const [businessContext, setBusinessContext] =
         useState<BusinessContext>(null)
 
@@ -40,15 +43,23 @@ function ProvideContext() {
     const navigate = useNavigate()
 
     const onSubmit = async (form: BusinessContextForm) => {
+        setUploadError(false)
         const organization = userSession.user.organization
         const businessContextPromise = saveBusinessContext(organization, form)
         const painpointsPromise = savePainpoints(organization)
-        const responses = await Promise.all([
-            painpointsPromise,
-            businessContextPromise
-        ])
-        if (responses.some((response) => !response.ok)) {
-            console.error("Error on business context save")
+        try {
+            const responses = await Promise.all([
+                painpointsPromise,
+                businessContextPromise
+            ])
+            if (responses && responses.some((response) => !response.ok)) {
+                console.error("Error on business context save")
+                setUploadError(true)
+                return
+            }
+        } catch (error) {
+            console.error(error)
+            setUploadError(true)
             return
         }
         alert("Business context saved with success")
@@ -153,6 +164,17 @@ function ProvideContext() {
     return (
         <>
             <div className="flex flex-col w-full">
+                {uploadError && (
+                    <div
+                        className="flex items-center bg-red-400 text-xs text-white rounded-md p-2"
+                        role="alert">
+                        <WarningSvg className="w-[20px] m-2" />
+                        <p className="w-11/12">
+                            Error during battlecards import. The .csv file
+                            provided doesn’t correspond to the expected format.
+                        </p>
+                    </div>
+                )}
                 <div className="text-center">
                     <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
                         Provide context
@@ -232,6 +254,23 @@ function ProvideContext() {
                                 className="block text-sm mb-2 dark:text-white">
                                 Your battlecards
                             </label>
+                            <div className="flex-col">
+                                <div className="flex items-center my-2 text-red-600">
+                                    <WarningSvg className="w-[20px] m-2" />
+                                    <p className="text-xs w-11/12">
+                                        This will replace previously imported
+                                        battlecards.
+                                    </p>
+                                </div>
+                                <div className="flex items-center my-2 text-klosio-yellow-400">
+                                    <InfoSvg className="w-[20px] m-2" />
+                                    <p className="text-xs w-11/12">
+                                        Import a list of pain points with the
+                                        corresponding answer as a .csv file
+                                        following the template below.
+                                    </p>
+                                </div>
+                            </div>
                             <div className="w-full">
                                 <label
                                     htmlFor="battlecards"
