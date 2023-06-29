@@ -22,7 +22,7 @@ async function PostOrganizationRequestHandler(
         const createdOrganization = await organizationRepository.create(
             organization
         )
-        await userRepository.updateOrganization(user, createdOrganization)
+        await userRepository.updateOrganization(user, createdOrganization.id)
         return res.status(201).json(organization)
     } catch (err) {
         console.error(err)
