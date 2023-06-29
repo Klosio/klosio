@@ -10,6 +10,8 @@ import type BusinessContext from "~types/businessContext.model"
 import type Organization from "~types/organization.model"
 import { businessContextFormSchema } from "~validation/businessContextForm.schema"
 
+import { FormErrorIcon, FormErrorMessage } from "./FormsError"
+
 const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
 type BusinessContextForm = z.infer<typeof businessContextFormSchema>
@@ -25,6 +27,8 @@ function ProvideContext() {
         reset,
         formState: { errors, isValid, isSubmitting }
     } = useForm<BusinessContextForm>({
+        mode: "onBlur",
+        reValidateMode: "onBlur",
         resolver: zodResolver(businessContextFormSchema),
         defaultValues: {
             ...businessContext
@@ -176,14 +180,9 @@ function ProvideContext() {
                                     className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                     placeholder="Software as a Service"
                                 />
-                                {errors.industry && (
-                                    <div>
-                                        <p className="text-xs text-red-600 mt-2">
-                                            {errors.industry?.message}
-                                        </p>
-                                    </div>
-                                )}
+                                <FormErrorIcon error={errors?.industry} />
                             </div>
+                            <FormErrorMessage error={errors?.industry} />
                         </div>
                         <div className="w-full">
                             <label
@@ -197,16 +196,11 @@ function ProvideContext() {
                                     type="text"
                                     {...register("selling", { required: true })}
                                     className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                    placeholder="Scheduling and workforce management software"
+                                    placeholder="Management software"
                                 />
-                                {errors.selling && (
-                                    <div>
-                                        <p className="text-xs text-red-600 mt-2">
-                                            {errors.selling?.message}
-                                        </p>
-                                    </div>
-                                )}
+                                <FormErrorIcon error={errors?.selling} />
                             </div>
+                            <FormErrorMessage error={errors?.selling} />
                         </div>
                         <div className="w-full">
                             <label
@@ -221,14 +215,9 @@ function ProvideContext() {
                                     className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
                                     placeholder="Companies in Healthcare, Manufacturing, Hospitality, Retail..."
                                 />
-                                {errors.target && (
-                                    <div>
-                                        <p className="text-xs text-red-600 mt-2">
-                                            {errors.target?.message}
-                                        </p>
-                                    </div>
-                                )}
+                                <FormErrorIcon error={errors?.target} />
                             </div>
+                            <FormErrorMessage error={errors?.target} />
                         </div>
 
                         <a
@@ -264,12 +253,8 @@ function ProvideContext() {
                                         setCsvFile(event.target.files[0])
                                     }}
                                 />
-                                {errors.battlecards && (
-                                    <div>
-                                        <p className="text-xs text-red-600 mt-2"></p>
-                                    </div>
-                                )}
                             </div>
+                            <FormErrorMessage error={errors?.battlecards} />
                         </div>
 
                         <button

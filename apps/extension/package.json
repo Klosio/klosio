@@ -15,7 +15,6 @@
     "@plasmohq/storage": "^1.6.0",
     "@supabase/supabase-js": "^2.25.0",
     "file-saver": "^2.0.5",
-    "formik": "^2.2.9",
     "inline-worker": "^1.1.0",
     "plasmo": "^0.73.2",
     "preline": "^1.8.0",
