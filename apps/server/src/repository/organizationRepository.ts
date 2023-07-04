@@ -4,8 +4,9 @@ import { v4 as uuid } from "uuid"
 
 interface OrganizationRepository {
     find(id: string): Promise<Organization>
+    findByDomain(domain: string): Promise<Organization>
+    getDomain(id: string): Promise<string>
     create(organization: Omit<Organization, "id">): Promise<Organization>
-    searchDomain(domain: string): Promise<Organization>
     saveDomain(organization: Organization, domain: string): Promise<void>
 }
 
@@ -13,7 +14,7 @@ const organizationRepository: OrganizationRepository = {
     async find(id: string): Promise<Organization> {
         const { data, error } = await supabaseClient
             .from("organizations")
-            .select("id, name")
+            .select("id, name, domain")
             .eq("id", id)
             .single()
 
@@ -42,7 +43,7 @@ const organizationRepository: OrganizationRepository = {
         }
         return data
     },
-    async searchDomain(domain: string): Promise<Organization> {
+    async findByDomain(domain: string): Promise<Organization> {
         const { data, error } = await supabaseClient
             .from("organizations")
             .select("id, name, domain")
@@ -56,6 +57,21 @@ const organizationRepository: OrganizationRepository = {
         }
 
         return data[0]
+    },
+    async getDomain(id: string): Promise<string> {
+        const { data, error } = await supabaseClient
+            .from("organizations")
+            .select("domain")
+            .eq("id", id)
+            .single()
+
+        if (error) {
+            throw new Error(
+                `Error when retrieving organization with id ${id}`,
+                { cause: error }
+            )
+        }
+        return data.domain
     },
     async saveDomain(
         organization: Organization,

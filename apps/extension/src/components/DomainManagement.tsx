@@ -5,23 +5,11 @@ import { Link } from "react-router-dom"
 import InfoSvg from "react:~/assets/svg/info.svg"
 import { z } from "zod"
 
-import { supabase } from "~core/supabase"
 import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
 
+import { emailManagementFormSchema } from "~validation/emailManagementForm.schema"
 import SuccessAlert from "./SuccessAlert"
-
-const emailManagementFormSchema = z.object({
-    domain: z
-        .string()
-        .regex(
-            new RegExp(
-                /^(?!-)[A-Za-z0-9-]+([\-\.]{1}[a-z0-9]+)*\.[A-Za-z]{2,6}$/
-            ),
-            "The domain is invalid"
-        )
-        .nonempty("The domain is required")
-})
 
 type EmailManagementForm = z.infer<typeof emailManagementFormSchema>
 
@@ -50,24 +38,27 @@ function DomainManagement() {
     })
 
     useEffect(() => {
-        const fetch = async () => {
-            await fetchDefaultDomain()
-        }
-        fetch()
+        fetchDefaultDomain()
     }, [])
 
     const fetchDefaultDomain = async () => {
-        if (userSession.user.organization.id) {
-            const { data, error } = await supabase
-                .from("organizations")
-                .select("domain")
-                .eq("id", userSession.user.organization.id)
-                .single()
-            if (error) {
-                console.log(error)
+        const id = userSession?.user?.organization?.id
+        if (id) {
+            const response = await fetch(
+                `${serverUri}/api/v1/organizations/${id}?fields=domain`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${userSession.token}`
+                    }
+                }
+            )
+            if (!response.ok) {
+                console.error("Error on email domain get")
                 return
             }
-            setValue("domain", data.domain)
+            const organization: Partial<Organization> = await response.json()
+            setValue("domain", organization.domain)
         }
     }
 
@@ -103,7 +94,7 @@ function DomainManagement() {
     return (
         <div className="flex flex-col items-center justify-center w-full space-y-3">
             {showSuccess && (
-                <SuccessAlert message="Your organization has been sucessfully created." />
+                <SuccessAlert message="Your domain has been sucessfully saved." />
             )}
             {showError && <>Error</>}
             <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -26,19 +26,15 @@ type OptionsForm = z.infer<typeof optionsFormSchema>
 const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
 function Options(props: OptionsProps) {
-    const [currentPrompt, setCurrentPrompt] = useState("")
-
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { isValid, isSubmitting, errors }
     } = useForm<OptionsForm>({
         mode: "onBlur",
         reValidateMode: "onBlur",
-        resolver: zodResolver(optionsFormSchema),
-        defaultValues: {
-            prompt: currentPrompt
-        }
+        resolver: zodResolver(optionsFormSchema)
     })
 
     const onSubmit = async (data: OptionsForm) => await savePrompt(data)
@@ -55,7 +51,7 @@ function Options(props: OptionsProps) {
             return
         }
         const option: Option = await response.json()
-        setCurrentPrompt(option.value)
+        setValue("prompt", option.value)
     }
 
     const savePrompt = async (form: OptionsForm) => {
@@ -71,7 +67,7 @@ function Options(props: OptionsProps) {
             console.error("Error on prompt save")
             return
         }
-        setCurrentPrompt(form.prompt)
+        setValue("prompt", form.prompt)
         alert("Prompt updated")
     }
 

@@ -25,8 +25,7 @@ async function PostUserRequestHandler(
 
     try {
         let createdUser = await userRepository.create(user)
-        const organization = await organizationRepository.searchDomain(domain)
-
+        const organization = await organizationRepository.findByDomain(domain)
         if (!!organization) {
             createdUser = await userRepository.updateOrganization(
                 createdUser,
