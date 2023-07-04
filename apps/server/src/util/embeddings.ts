@@ -39,6 +39,14 @@ async function searchEmbeddings(
     question: string,
     organizationId: string
 ): Promise<EmbeddingResponse> {
+    const defaultResponse = {
+        status: "Sorry, I don't know how to help with that."
+    }
+    const wordCount = question.split(" ").length
+
+    if (wordCount < 3) {
+        return defaultResponse
+    }
     // OpenAI recommends replacing newlines with spaces for best results
     const input = question.replace(/\n/g, " ")
 
@@ -66,8 +74,9 @@ async function searchEmbeddings(
     ]).catch((error) => console.error(error))
 
     if (!results) {
-        return { status: "Sorry, I don't know how to help with that." }
+        return defaultResponse
     }
+
     const [embeddedPainpoints, businessContexts, option] = results
 
     if (!businessContexts || !businessContexts.length) {
@@ -79,7 +88,7 @@ async function searchEmbeddings(
 
     if (!embeddedPainpoints || !embeddedPainpoints.length) {
         console.log(`no pain points for ${organizationId}`)
-        return { status: "Sorry, I don't know how to help with that." }
+        return defaultResponse
     }
 
     if (businessContexts.length > 1) {
@@ -102,17 +111,15 @@ async function searchEmbeddings(
     }
 
     const prompt = getPrompt(option?.value, variables)
-    console.log(prompt)
-    const completionResponse = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt,
+
+    const completionResponse = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "system", content: prompt }],
         max_tokens: 512,
-        temperature: 0
+        temperature: 0.8
     })
 
-    const {
-        choices: [{ text }]
-    } = completionResponse.data
+    const text = completionResponse.data.choices[0].message?.content
 
     if (!text) {
         return { status: "Sorry, I don't know how to help with that." }

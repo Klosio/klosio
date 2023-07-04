@@ -4,33 +4,10 @@ import supportedLanguages from "../../../util/supportedLanguages"
 import { Deepgram } from "@deepgram/sdk"
 import dotenv from "dotenv"
 import { NextFunction, Request, Response } from "express"
-import { Configuration, OpenAIApi } from "openai"
 
 dotenv.config()
 
 const deepgram_api_key = getEnvVar("DEEPGRAM_API_KEY")
-const openai_api_key = getEnvVar("OPENAI_API_KEY")
-
-const gptAnalysis = async (
-    systemPrompt: string,
-    transcript: string
-): Promise<string> => {
-    const configuration = new Configuration({
-        apiKey: openai_api_key
-    })
-    const openai = new OpenAIApi(configuration)
-
-    const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: transcript }
-        ],
-        max_tokens: 150
-    })
-    const gptresult = completion.data.choices[0].message?.content
-    return gptresult || ""
-}
 
 const deepgramAnalysis = async (
     buffer: Buffer,
