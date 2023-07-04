@@ -12,7 +12,7 @@ interface invitationsRepository {
         organization_id: string,
         registered: boolean
     ): Promise<Invitation[]>
-    getByEmail(email: string): Promise<Invitation>
+    getByEmail(email: string): Promise<Invitation | null>
     delete(id: string): Promise<void>
     disable(id: string): Promise<void>
 }
@@ -38,12 +38,12 @@ const invitationsRepository: invitationsRepository = {
         }
         return data
     },
-    async getByEmail(email: string): Promise<Invitation> {
+    async getByEmail(email: string): Promise<Invitation | null> {
         const { data, error } = await supabaseClient
             .from("invitations")
             .select("id, email, organization_id, registered")
             .eq("email", email)
-            .single()
+            .maybeSingle()
 
         if (error) {
             throw new Error(`Error when retrieving invitations`, {
