@@ -6,14 +6,14 @@ import { v4 as uuid } from "uuid"
 interface UserRepository {
     findByAuthId(authId: string): Promise<User>
     create(user: Omit<User, "id">): Promise<User>
-    updateOrganization(user: User, organization_id: string): Promise<User>
+    update(user: User): Promise<User>
 }
 
 const userRepository: UserRepository = {
     async findByAuthId(authId: string): Promise<User> {
         const { data, error } = await supabaseClient
             .from("users")
-            .select("id, email, auth_id, organizations ( id, name )")
+            .select("id, email, auth_id, role_id, organizations ( id, name )")
             .eq("auth_id", authId)
             .single()
 
@@ -44,15 +44,16 @@ const userRepository: UserRepository = {
         }
         return data
     },
-    async updateOrganization(
-        user: User,
-        organization_id: string
-    ): Promise<User> {
+    async update(user: User): Promise<User> {
         const { data, error } = await supabaseClient
             .from("users")
-            .update({ organization_id })
+            .update({
+                email: user.email,
+                role_id: user.role_id,
+                organization_id: user.organization?.id
+            })
             .eq("id", user.id)
-            .select("id, email, auth_id, organizations ( name )")
+            .select("id, email, auth_id, role_id, organizations ( name )")
             .single()
 
         if (error) {

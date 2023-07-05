@@ -5,4 +5,5 @@ export default interface User {
     auth_id?: string
     email: string
     organization?: Organization
+    role_id?: string
 }
