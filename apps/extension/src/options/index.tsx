@@ -79,7 +79,7 @@ function IndexOptions() {
     return (
         <div className="m-2 flex flex-col w-full text-center">
             <AppHeader />
-            {userSession ? (
+            {userSession && userSession?.user?.role_id === "KLOSIO_ADMIN" ? (
                 <Options userSession={userSession} />
             ) : (
                 <OptionsUnauthorized />

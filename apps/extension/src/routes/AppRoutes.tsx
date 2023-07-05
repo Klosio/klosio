@@ -12,6 +12,7 @@ import SignUp from "~components/SignUp"
 import { isRecordingAllowed, startRecording } from "~core/recorder"
 import { useAuth } from "~providers/AuthProvider"
 
+import RoleGuard from "./RoleGuard"
 import RouteGuard from "./RouteGuard"
 
 interface AppRoutesProps {
@@ -21,7 +22,6 @@ interface AppRoutesProps {
 function AppRoutes(props: AppRoutesProps) {
     const { userSession } = useAuth()
     const isUserLoggedIn = userSession ? !!userSession.user : false
-
     return (
         <Routes>
             <Route
@@ -54,7 +54,15 @@ function AppRoutes(props: AppRoutesProps) {
                 path="/menu"
                 element={
                     <RouteGuard isAccessible={isUserLoggedIn}>
-                        <Menu currentTab={props.currentTab} />
+                        <RoleGuard
+                            grantedRoles={[
+                                "KLOSIO_ADMIN",
+                                "ORG_ADMIN",
+                                "ORG_MEMBER"
+                            ]}
+                            userRole={userSession?.user?.role_id}>
+                            <Menu currentTab={props.currentTab} />
+                        </RoleGuard>
                     </RouteGuard>
                 }
             />
@@ -66,7 +74,15 @@ function AppRoutes(props: AppRoutesProps) {
                             isUserLoggedIn &&
                             isRecordingAllowed(props.currentTab)
                         }>
-                        <LanguageSelection {...{ startRecording }} />
+                        <RoleGuard
+                            grantedRoles={[
+                                "KLOSIO_ADMIN",
+                                "ORG_ADMIN",
+                                "ORG_MEMBER"
+                            ]}
+                            userRole={userSession?.user?.role_id}>
+                            <LanguageSelection {...{ startRecording }} />
+                        </RoleGuard>
                     </RouteGuard>
                 }
             />
@@ -74,7 +90,11 @@ function AppRoutes(props: AppRoutesProps) {
                 path="/createOrganization"
                 element={
                     <RouteGuard isAccessible={isUserLoggedIn}>
-                        <OrganizationCreation />
+                        <RoleGuard
+                            grantedRoles={["KLOSIO_ADMIN", "ORG_ADMIN"]}
+                            userRole={userSession?.user?.role_id}>
+                            <OrganizationCreation />
+                        </RoleGuard>
                     </RouteGuard>
                 }
             />
@@ -82,7 +102,11 @@ function AppRoutes(props: AppRoutesProps) {
                 path="/domainManagement"
                 element={
                     <RouteGuard isAccessible={isUserLoggedIn}>
-                        <DomainManagement />
+                        <RoleGuard
+                            grantedRoles={["KLOSIO_ADMIN", "ORG_ADMIN"]}
+                            userRole={userSession?.user?.role_id}>
+                            <DomainManagement />
+                        </RoleGuard>
                     </RouteGuard>
                 }
             />
@@ -90,7 +114,11 @@ function AppRoutes(props: AppRoutesProps) {
                 path="/emailManagement"
                 element={
                     <RouteGuard isAccessible={isUserLoggedIn}>
-                        <EmailManagement />
+                        <RoleGuard
+                            grantedRoles={["KLOSIO_ADMIN", "ORG_ADMIN"]}
+                            userRole={userSession?.user?.role_id}>
+                            <EmailManagement />
+                        </RoleGuard>
                     </RouteGuard>
                 }
             />
@@ -98,7 +126,11 @@ function AppRoutes(props: AppRoutesProps) {
                 path="/provideContext"
                 element={
                     <RouteGuard isAccessible={isUserLoggedIn}>
-                        <ProvideContext />
+                        <RoleGuard
+                            grantedRoles={["KLOSIO_ADMIN", "ORG_ADMIN"]}
+                            userRole={userSession?.user?.role_id}>
+                            <ProvideContext />
+                        </RoleGuard>
                     </RouteGuard>
                 }
             />
