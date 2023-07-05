@@ -10,7 +10,7 @@ function RouteGuard({
     isAccessible = false,
     redirectTo = "/",
     children
-}: RouteGuardProps) {
+}: RouteGuardProps): JSX.Element {
     return isAccessible ? children : <Navigate to={redirectTo} replace />
 }
 
