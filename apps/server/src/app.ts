@@ -1,5 +1,6 @@
 import apiRouter from "./api/router"
 import * as middlewares from "./middlewares/middlewares"
+import { verifyKlosioUser } from "./middlewares/rbac"
 import getEnvVar from "./util/env"
 import cors from "cors"
 import express from "express"
@@ -21,11 +22,13 @@ app.use(helmet())
 app.use(cors())
 app.use(expressjwt(jwtConfig))
 app.use(express.json())
+app.use(verifyKlosioUser)
 
 app.use("/api", apiRouter)
 
 app.use(middlewares.authErrorHandler)
 app.use(middlewares.notFound)
+app.use(verifyKlosioUser)
 app.use(middlewares.errorHandler)
 
 export default app

@@ -22,8 +22,12 @@ async function PostOrganizationRequestHandler(
         const createdOrganization = await organizationRepository.create(
             organization
         )
-        await userRepository.updateOrganization(user, createdOrganization.id)
-        return res.status(201).json(createdOrganization)
+        await userRepository.update({
+            ...user,
+            role_id: "ORG_ADMIN",
+            organization: { id: createdOrganization.id }
+        })
+        return res.status(201).json(organization)
     } catch (err) {
         console.error(err)
         res.status(500)

@@ -24,22 +24,28 @@ async function PostUserRequestHandler(
     const domain = email.match(new RegExp(/.*@(\S+)/))[1]
 
     try {
-        let createdUser = await userRepository.create(user)
+        let createdUser = await userRepository.create({
+            ...user,
+            role_id: "ORG_ADMIN"
+        })
         const organization = await organizationRepository.findByDomain(domain)
+
         if (!!organization) {
-            createdUser = await userRepository.updateOrganization(
-                createdUser,
-                organization.id
-            )
+            createdUser = await userRepository.update({
+                ...createdUser,
+                role_id: "ORG_MEMBER",
+                organization: { id: organization.id }
+            })
         }
 
         const emailInvitation = await invitationsRepository.getByEmail(email)
 
         if (!!emailInvitation) {
-            createdUser = await userRepository.updateOrganization(
-                createdUser,
-                emailInvitation.organization_id
-            )
+            createdUser = await userRepository.update({
+                ...createdUser,
+                role_id: "ORG_MEMBER",
+                organization: { id: organization.id }
+            })
             await invitationsRepository.disable(emailInvitation.id)
         }
 
