@@ -8,6 +8,7 @@ interface PainpointRepository {
     ): Promise<EmbeddedPainpoint[]>
     create(painpoints: EmbeddedPainpoint[]): Promise<void>
     deleteByOrganizationId(organizationId: string): Promise<void>
+    exists(organizationId: string): Promise<boolean>
 }
 
 const painpointRepository: PainpointRepository = {
@@ -48,6 +49,21 @@ const painpointRepository: PainpointRepository = {
                 { cause: error }
             )
         }
+    },
+    async exists(organizationId: string): Promise<boolean> {
+        const { data, error } = await supabaseClient
+            .from("painpoints")
+            .select("id")
+            .eq("organization_id", organizationId)
+
+        if (error) {
+            throw new Error(
+                `Error when counting painpoints with organization id ${organizationId}`,
+                { cause: error }
+            )
+        }
+
+        return !!data?.length
     }
 }
 

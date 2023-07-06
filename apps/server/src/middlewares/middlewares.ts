@@ -8,7 +8,7 @@ export function notFound(req: Request, res: Response, next: NextFunction) {
 
 export function authErrorHandler(
     err: Error,
-    req: Request,
+    _req: Request,
     res: Response<ErrorResponse>,
     next: NextFunction
 ) {
