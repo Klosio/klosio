@@ -7,6 +7,7 @@ interface BusinessContextRepository {
         businessContext: Omit<BusinessContext, "id">
     ): Promise<BusinessContext>
     update(businessContext: BusinessContext): Promise<BusinessContext>
+    exists(organizationId: string): Promise<boolean>
 }
 
 const businessContextRepository: BusinessContextRepository = {
@@ -58,6 +59,21 @@ const businessContextRepository: BusinessContextRepository = {
             )
         }
         return data
+    },
+    async exists(organizationId: string): Promise<boolean> {
+        const { data, error } = await supabaseClient
+            .from("business_contexts")
+            .select("id")
+            .eq("organization_id", organizationId)
+
+        if (error) {
+            throw new Error(
+                `Error when counting painpoints with organization id ${organizationId}`,
+                { cause: error }
+            )
+        }
+
+        return !!data?.length
     }
 }
 

@@ -10,21 +10,41 @@ interface MenuProps {
     currentTab: chrome.tabs.Tab
 }
 
+const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
+
 function Menu(props: MenuProps) {
     const navigate = useNavigate()
     const { userSession, logout } = useAuth()
 
     const [record, setRecord] = useState(true)
+    const [isReady, setIsReady] = useState(false)
 
     const handleLogout = async () => {
         supabase.auth.signOut()
         await logout()
     }
 
+    const fetchOrganizationState = async () =>
+        await fetch(
+            `${serverUri}/api/v1/organizations/${userSession.user.organization.id}/ready`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${userSession.token}`
+                }
+            }
+        )
+            .then((response) => response.json())
+            .then((data) => {
+                setIsReady(data.ready)
+            })
+
     useEffect(() => {
         const updateRecordingStatus = async () => {
             const recordingStatus = await isRecording()
             setRecord(recordingStatus)
+            await fetchOrganizationState()
         }
         updateRecordingStatus()
     }, [])
@@ -37,7 +57,9 @@ function Menu(props: MenuProps) {
                     <button
                         onClick={() => navigate("/startMeeting")}
                         disabled={
-                            !isRecordingAllowed(props.currentTab) || record
+                            !isRecordingAllowed(props.currentTab) ||
+                            record ||
+                            !isReady
                         }
                         className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold disabled:cursor-not-allowed disabled:bg-klosio-green-200 bg-klosio-green-300 text-white hover:bg-klosio-green-400 focus:outline-none focus:ring-2 focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                         Start a meeting
