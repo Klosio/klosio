@@ -1,5 +1,5 @@
-import { organizationRepository } from "../../../repository/organizationRepository"
 import { NextFunction, Request, Response } from "express"
+import { organizationRepository } from "~/repository/organizationRepository"
 
 const availableFields = ["id", "name", "domain"]
 type AvailableFields = (typeof availableFields)[number]

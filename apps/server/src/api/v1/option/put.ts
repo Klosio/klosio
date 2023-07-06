@@ -1,5 +1,5 @@
-import { optionRepository } from "../../../repository/optionRepository"
 import { NextFunction, Request, Response } from "express"
+import { optionRepository } from "~/repository/optionRepository"
 
 async function PutOptionRequestHandler(
     req: Request<{ name: string }>,

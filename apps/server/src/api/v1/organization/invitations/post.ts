@@ -1,5 +1,5 @@
-import { supabaseClient } from "../../../../util/supabase"
 import { NextFunction, Request, Response } from "express"
+import { supabaseClient } from "~/"
 
 const PostInvitationRequestHandler = async (
     req: Request<{ id: string }, {}, { emails: Array<{ email: string }> }>,

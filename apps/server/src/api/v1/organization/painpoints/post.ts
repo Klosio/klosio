@@ -1,8 +1,8 @@
-import { painpointRepository } from "../../../../repository/painpointRepository"
-import { generateEmbeddings } from "../../../../util/embeddings"
 import { NextFunction, Request, Response } from "express"
 import { parse } from "papaparse"
 import { z } from "zod"
+import { painpointRepository } from "~/repository/painpointRepository"
+import { generateEmbeddings } from "~/util/embeddings"
 
 async function PostPainpointsRequestHandler(
     req: Request<{ id: string }>,

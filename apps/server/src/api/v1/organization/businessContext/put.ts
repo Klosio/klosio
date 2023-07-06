@@ -1,7 +1,7 @@
-import { businessContextRepository } from "../../../../repository/businessContextRepository"
-import BusinessContext from "../../../../types/BusinessContext"
-import { businessContextSchema } from "../../../../validation/businessContext.schema"
 import { NextFunction, Request, Response } from "express"
+import { businessContextRepository } from "~/repository/businessContextRepository"
+import BusinessContext from "~/types/BusinessContext"
+import { businessContextSchema } from "~/validation/businessContext.schema"
 
 async function PutBusinessContextRequestHandler(
     req: Request<{ id: string; businessContextId: string }>,

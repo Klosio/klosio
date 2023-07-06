@@ -1,5 +1,5 @@
-import Option from "../types/Option"
-import { supabaseClient } from "../util/supabase"
+import Option from "~/types/Option"
+import { supabaseClient } from "~/util/supabase"
 
 interface OptionRepository {
     findByName(name: string): Promise<Option>

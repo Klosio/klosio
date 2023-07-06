@@ -1,6 +1,6 @@
 import Organization from "../types/Organization"
-import { supabaseClient } from "../util/supabase"
 import { v4 as uuid } from "uuid"
+import { supabaseClient } from "~/util/supabase"
 
 interface OrganizationRepository {
     find(id: string): Promise<Organization>

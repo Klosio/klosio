@@ -1,7 +1,7 @@
-import Organization from "../types/Organization"
-import User from "../types/User"
-import { supabaseClient } from "../util/supabase"
 import { v4 as uuid } from "uuid"
+import Organization from "~/types/Organization"
+import User from "~/types/User"
+import { supabaseClient } from "~/util/supabase"
 
 interface UserRepository {
     findByAuthId(authId: string): Promise<User>
