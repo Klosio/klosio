@@ -1,4 +1,4 @@
-import { supabaseClient } from "../util/supabase"
+import { supabaseClient } from "~/util/supabase"
 
 interface RolesRepository {
     getRoles(): Promise<Array<string>>

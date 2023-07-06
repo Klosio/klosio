@@ -1,5 +1,5 @@
-import { businessContextRepository } from "../../../../repository/businessContextRepository"
 import { NextFunction, Request, Response } from "express"
+import { businessContextRepository } from "~/repository/businessContextRepository"
 
 async function GetBusinessContextRequestHandler(
     req: Request<{ id: string }>,

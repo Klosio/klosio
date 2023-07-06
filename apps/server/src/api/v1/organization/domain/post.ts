@@ -1,6 +1,6 @@
-import { organizationRepository } from "../../../../repository/organizationRepository"
 import { NextFunction, Request, Response } from "express"
 import { z } from "zod"
+import { organizationRepository } from "~/repository/organizationRepository"
 
 const emailManagementFormSchema = z.object({
     domain: z

@@ -1,8 +1,8 @@
-import invitationsRepository from "../../../repository/invitationRepository"
-import { organizationRepository } from "../../../repository/organizationRepository"
-import { userRepository } from "../../../repository/userRepository"
-import User from "../../../types/User"
 import { NextFunction, Request, Response } from "express"
+import invitationsRepository from "~/repository/invitationRepository"
+import { organizationRepository } from "~/repository/organizationRepository"
+import { userRepository } from "~/repository/userRepository"
+import User from "~/types/User"
 
 async function PostUserRequestHandler(
     req: Request,

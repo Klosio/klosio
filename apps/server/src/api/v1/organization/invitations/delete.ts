@@ -1,6 +1,6 @@
-import invitationsRepository from "../../../../repository/invitationRepository"
-import { organizationRepository } from "../../../../repository/organizationRepository"
 import { NextFunction, Request, Response } from "express"
+import invitationsRepository from "~/repository/invitationRepository"
+import { organizationRepository } from "~/repository/organizationRepository"
 
 const DeleteInvitationRequestHandler = async (
     req: Request<{ id: string }, {}, { email: string }>,

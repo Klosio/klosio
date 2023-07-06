@@ -1,7 +1,7 @@
-import { organizationRepository } from "../../../repository/organizationRepository"
-import { userRepository } from "../../../repository/userRepository"
-import Organization from "../../../types/Organization"
 import { NextFunction, Request, Response } from "express"
+import { organizationRepository } from "~/repository/organizationRepository"
+import { userRepository } from "~/repository/userRepository"
+import Organization from "~/types/Organization"
 
 async function PostOrganizationRequestHandler(
     req: Request,

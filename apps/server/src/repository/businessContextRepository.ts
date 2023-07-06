@@ -1,5 +1,5 @@
-import BusinessContext from "../types/BusinessContext"
-import { supabaseClient } from "../util/supabase"
+import BusinessContext from "~/types/BusinessContext"
+import { supabaseClient } from "~/util/supabase"
 
 interface BusinessContextRepository {
     findByOrganization(organizationId: string): Promise<BusinessContext[]>

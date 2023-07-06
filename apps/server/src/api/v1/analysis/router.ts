@@ -1,7 +1,7 @@
-import getEnvVar from "../../../util/env"
 import PostAnalysisRequestHandler from "./post"
 import { Router } from "express"
 import multer from "multer"
+import getEnvVar from "~/util/env"
 
 const analysisRouter = Router()
 

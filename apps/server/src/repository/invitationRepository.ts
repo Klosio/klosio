@@ -1,4 +1,4 @@
-import { supabaseClient } from "../util/supabase"
+import { supabaseClient } from "~/util/supabase"
 
 interface Invitation {
     id: string

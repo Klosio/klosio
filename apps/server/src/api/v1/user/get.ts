@@ -1,5 +1,5 @@
-import { userRepository } from "../../../repository/userRepository"
 import { NextFunction, Request, Response } from "express"
+import { userRepository } from "~/repository/userRepository"
 
 async function GetUserRequestHandler(
     req: Request<{ authId: string }>,

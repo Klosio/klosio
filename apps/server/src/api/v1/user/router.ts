@@ -1,7 +1,7 @@
-import { permit } from "../../../middlewares/rbac"
 import GetUserRequestHandler from "../user/get"
 import PostUserRequestHandler from "../user/post"
 import { Router } from "express"
+import { permit } from "~/middlewares/rbac"
 
 const userRouter = Router()
 

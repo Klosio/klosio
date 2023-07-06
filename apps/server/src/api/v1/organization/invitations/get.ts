@@ -1,5 +1,5 @@
-import invitationsRepository from "../../../../repository/invitationRepository"
 import { NextFunction, Request, Response } from "express"
+import invitationsRepository from "~/repository/invitationRepository"
 
 const GetInvitationRequestHandler = async (
     req: Request<{ id: string }>,

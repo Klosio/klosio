@@ -1,5 +1,5 @@
 import { EmbeddedPainpoint } from "../types/Painpoint"
-import { supabaseClient } from "../util/supabase"
+import { supabaseClient } from "~/util/supabase"
 
 interface PainpointRepository {
     findByMatchingEmbedding(
