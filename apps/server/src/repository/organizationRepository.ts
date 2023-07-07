@@ -1,5 +1,4 @@
 import Organization from "../types/Organization"
-import { v4 as uuid } from "uuid"
 import { supabaseClient } from "~/util/supabase"
 
 interface OrganizationRepository {
@@ -31,7 +30,7 @@ const organizationRepository: OrganizationRepository = {
     ): Promise<Organization> {
         const { data, error } = await supabaseClient
             .from("organizations")
-            .insert({ id: uuid(), ...organization })
+            .insert(organization)
             .select()
             .single()
 

@@ -1,4 +1,3 @@
-import { v4 as uuid } from "uuid"
 import Organization from "~/types/Organization"
 import User from "~/types/User"
 import { supabaseClient } from "~/util/supabase"
@@ -32,7 +31,7 @@ const userRepository: UserRepository = {
     async create(user: Omit<User, "id">): Promise<User> {
         const { data, error } = await supabaseClient
             .from("users")
-            .insert({ id: uuid(), ...user })
+            .insert(user)
             .select()
             .single()
 
