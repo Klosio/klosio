@@ -26,7 +26,7 @@ function Menu(props: MenuProps) {
 
     const fetchOrganizationState = async () =>
         await fetch(
-            `${serverUri}/api/v1/organizations/${userSession.user.organization.id}/ready`,
+            `${serverUri}/api/v1/organizations/${userSession?.user?.organization?.id}/ready`,
             {
                 method: "GET",
                 headers: {
@@ -47,7 +47,7 @@ function Menu(props: MenuProps) {
             await fetchOrganizationState()
         }
         updateRecordingStatus()
-    }, [])
+    }, [userSession])
 
     return (
         <div className="m-2 flex flex-col space-y-2 text-sm text-center text-gray-700 dark:text-white">

@@ -28,13 +28,16 @@ async function PostUserRequestHandler(
             ...user,
             role_id: "ORG_ADMIN"
         })
-        const organization = await organizationRepository.findByDomain(domain)
 
-        if (!!organization) {
+        const organizationDomain = await organizationRepository.findByDomain(
+            domain
+        )
+
+        if (!!organizationDomain) {
             createdUser = await userRepository.update({
                 ...createdUser,
                 role_id: "ORG_MEMBER",
-                organization: { id: organization.id }
+                organization: { id: organizationDomain.id }
             })
         }
 
@@ -44,7 +47,7 @@ async function PostUserRequestHandler(
             createdUser = await userRepository.update({
                 ...createdUser,
                 role_id: "ORG_MEMBER",
-                organization: { id: organization.id }
+                organization: { id: emailInvitation.organization_id }
             })
             await invitationsRepository.disable(emailInvitation.id)
         }
