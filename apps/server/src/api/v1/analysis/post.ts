@@ -46,30 +46,25 @@ async function PostAnalysisRequestHandler(
         return next(new Error("No audio file provided in the request"))
     }
 
-    const deepgramResult = await deepgramAnalysis(
-        req.file.buffer,
-        req.params.language
-    ).catch((err) => {
-        console.error(err)
+    try {
+        const deepgramResult = await deepgramAnalysis(
+            req.file.buffer,
+            req.params.language
+        )
+        if (!deepgramResult || deepgramResult.split(" ").length < 3) {
+            res.status(400)
+            return next(new Error("No transcript returned by the API"))
+        }
+        const result = await searchEmbeddings(
+            deepgramResult,
+            req.params.organizationId
+        )
+        return res.status(200).json(result)
+    } catch (error) {
+        console.error(error)
         res.status(400)
         return next(new Error("Error when calling the transcription API"))
-    })
-
-    console.log(deepgramResult)
-
-    if (!deepgramResult) {
-        res.status(400)
-        return next(new Error("No transcript returned by the API"))
     }
-
-    const result = await searchEmbeddings(
-        deepgramResult,
-        req.params.organizationId
-    )
-
-    console.log(result)
-
-    return res.status(200).json(result)
 }
 
 export default PostAnalysisRequestHandler
