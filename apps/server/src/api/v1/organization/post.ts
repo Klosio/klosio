@@ -27,7 +27,7 @@ async function PostOrganizationRequestHandler(
             role_id: "ORG_ADMIN",
             organization: { id: createdOrganization.id }
         })
-        return res.status(201).json(organization)
+        return res.status(201).json(createdOrganization)
     } catch (err) {
         console.error(err)
         res.status(500)
