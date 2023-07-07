@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 
-interface AppHeaderProps {
-    backLink?: boolean
-}
-function AppHeader(props: AppHeaderProps) {
-    const { backLink = false } = props
+function AppHeader() {
+    const location = useLocation()
+
+    const disabledRoutes = ["/", "/menu"]
+
     return (
         <>
             <div className="border-b border-gray-200 flex flex-row relative">
-                {backLink && (
+                {!disabledRoutes.some(
+                    (route) => route === location.pathname
+                ) && (
                     <Link
                         to={".."}
                         className="w-[24px] h-[24px] absolute z-10 top-[2px] -left-1">
