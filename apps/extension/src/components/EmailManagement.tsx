@@ -121,8 +121,8 @@ function EmailManagement() {
                 Manage users
             </h1>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 text-center">
-                You don’t have a custom email domain or want to restrict access
-                to only a few users?
+                You have a custom email domain and want all users to be
+                automatically associated with your organization?
             </p>
             <Link
                 to={"/domainManagement"}

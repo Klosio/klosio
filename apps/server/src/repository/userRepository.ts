@@ -52,7 +52,7 @@ const userRepository: UserRepository = {
                 organization_id: user.organization?.id
             })
             .eq("id", user.id)
-            .select("id, email, auth_id, role_id, organizations ( name )")
+            .select("id, email, auth_id, role_id, organizations ( id, name )")
             .single()
 
         if (error) {
