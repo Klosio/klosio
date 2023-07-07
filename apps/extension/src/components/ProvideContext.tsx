@@ -3,16 +3,17 @@ import csvFileTemplate from "raw:~/assets/painpoints-template.csv"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
-import InfoSvg from "react:~/assets/svg/info.svg"
-import WarningSvg from "react:~/assets/svg/warning.svg"
 import { type z } from "zod"
 
+import WarningSvg from "react:~/assets/svg/warning.svg"
 import { useAuth } from "~providers/AuthProvider"
 import type BusinessContext from "~types/businessContext.model"
 import type Organization from "~types/organization.model"
 import { businessContextFormSchema } from "~validation/businessContextForm.schema"
 
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
+import Info from "./Info"
+import Warning from "./Warning"
 
 const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
@@ -241,13 +242,6 @@ function ProvideContext() {
                             </div>
                             <FormErrorMessage error={errors?.target} />
                         </div>
-
-                        <a
-                            href={csvFileTemplate}
-                            download
-                            className="text-klosio-blue-600 decoration-2 hover:underline font-medium">
-                            Download .csv template
-                        </a>
                         <div>
                             <label
                                 htmlFor="battlecards"
@@ -255,20 +249,22 @@ function ProvideContext() {
                                 Your battlecards
                             </label>
                             <div className="flex-col">
-                                <div className="flex items-center my-2 text-red-600">
-                                    <WarningSvg className="w-[20px] m-2" />
-                                    <p className="text-xs w-11/12">
-                                        This will replace previously imported
-                                        battlecards.
-                                    </p>
-                                </div>
-                                <div className="flex items-center my-2 text-klosio-yellow-400">
-                                    <InfoSvg className="w-[20px] m-2" />
-                                    <p className="text-xs w-11/12">
-                                        Import a list of pain points with the
-                                        corresponding answer as a .csv file
-                                        following the template below.
-                                    </p>
+                                <Warning>
+                                    This will replace previously imported
+                                    battlecards.
+                                </Warning>
+                                <Info>
+                                    Import a list of pain points with the
+                                    corresponding answer as a .csv file
+                                    following the template below.
+                                </Info>
+                                <div className="m-2">
+                                    <a
+                                        href={csvFileTemplate}
+                                        download
+                                        className="text-klosio-blue-600 decoration-2 hover:underline font-medium">
+                                        Download .csv template
+                                    </a>
                                 </div>
                             </div>
                             <div className="w-full">

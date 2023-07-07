@@ -7,6 +7,7 @@ import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
 
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
+import Info from "./Info"
 
 const organizationCreationFormSchema = z.object({
     name: z.string().nonempty({ message: "The name is required" })
@@ -99,6 +100,10 @@ function OrganizationCreation() {
                             </div>
                             <FormErrorMessage error={errors?.name} />
                         </div>
+                        <Info>
+                            Only you will be able to provide the business
+                            context and manage the organization users.
+                        </Info>
                         <button
                             type="submit"
                             disabled={!isValid || isSubmitting}

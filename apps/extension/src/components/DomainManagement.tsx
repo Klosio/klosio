@@ -2,13 +2,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect, useState } from "react"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { Link } from "react-router-dom"
-import InfoSvg from "react:~/assets/svg/info.svg"
 import { z } from "zod"
 
 import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
 
 import { emailManagementFormSchema } from "~validation/emailManagementForm.schema"
+import Info from "./Info"
 import SuccessAlert from "./SuccessAlert"
 
 type EmailManagementForm = z.infer<typeof emailManagementFormSchema>
@@ -126,18 +126,10 @@ function DomainManagement() {
                         placeholder="mydomain.com"
                     />
                 </div>
-                <div className="w-full flex flex-row items-center space-x-1">
-                    <div>
-                        <InfoSvg className="text-klosio-yellow-400 h-[20px] w-[20px]" />
-                    </div>
-                    <div className="w-full">
-                        <p className="text-xs text-klosio-yellow-400">
-                            All users signing-in with an email address from your
-                            domain will automatically be associated with your
-                            organization.
-                        </p>
-                    </div>
-                </div>
+                <Info>
+                    All users signing-in with an email address from your domain
+                    will automatically be associated with your organization.
+                </Info>
                 <button
                     type="submit"
                     disabled={!isValid || isSubmitting}

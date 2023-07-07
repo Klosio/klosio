@@ -13,7 +13,7 @@ const v1Router = Router()
     v1Router.use("/analysis", permit("KLOSIO_ADMIN", "ORG_ADMIN", "ORG_MEMBER"), analysisRouter)
     v1Router.use("/health", permit("KLOSIO_ADMIN"), healthRouter)
     v1Router.use("/options", permit("KLOSIO_ADMIN"), optionRouter)
-    v1Router.use("/organizations", permit("KLOSIO_ADMIN", "ORG_ADMIN"), organizationRouter)
+    v1Router.use("/organizations", organizationRouter)
     v1Router.use("/users", userRouter)
 }
 
