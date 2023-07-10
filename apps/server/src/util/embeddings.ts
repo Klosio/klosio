@@ -5,6 +5,7 @@ import { EmbeddedPainpoint, Painpoint } from "../types/Painpoint"
 import getEnvVar from "./env"
 import { PromptVariables, getPrompt } from "./prompt"
 import { Configuration, OpenAIApi } from "openai"
+import { Analysis } from "~/constants/analysis"
 
 const openApiKey = getEnvVar("OPENAI_API_KEY")
 
@@ -44,7 +45,7 @@ async function searchEmbeddings(
     }
     const wordCount = question.split(" ").length
 
-    if (wordCount < 3) {
+    if (wordCount <= Analysis.MIN_WORDS) {
         return defaultResponse
     }
     // OpenAI recommends replacing newlines with spaces for best results

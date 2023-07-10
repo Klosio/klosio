@@ -1,6 +1,7 @@
 import { Deepgram } from "@deepgram/sdk"
 import dotenv from "dotenv"
 import { NextFunction, Request, Response } from "express"
+import { Analysis } from "~/constants/analysis"
 import { searchEmbeddings } from "~/util/embeddings"
 import getEnvVar from "~/util/env"
 import supportedLanguages from "~/util/supportedLanguages"
@@ -51,7 +52,10 @@ async function PostAnalysisRequestHandler(
             req.file.buffer,
             req.params.language
         )
-        if (!deepgramResult || deepgramResult.split(" ").length < 3) {
+        if (
+            !deepgramResult ||
+            deepgramResult.split(" ").length <= Analysis.MIN_WORDS
+        ) {
             res.status(400)
             return next(new Error("No transcript returned by the API"))
         }
