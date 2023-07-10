@@ -11,15 +11,17 @@ import "~/style.css"
 
 import { FormErrorMessage } from "./FormsError"
 
+import { MATCH_THRESHOLD, PROMPT } from "~constants/options"
+import { optionsFormSchema } from "~validation/optionsForm.schema"
+
 import("preline")
+
+const availableOptions = [PROMPT, MATCH_THRESHOLD] as const
+export type AvailableOption = (typeof availableOptions)[number]
 
 interface OptionsProps {
     userSession: UserSession
 }
-
-const optionsFormSchema = z.object({
-    prompt: z.string().nonempty({ message: "The prompt is required" })
-})
 
 type OptionsForm = z.infer<typeof optionsFormSchema>
 
@@ -37,42 +39,68 @@ function Options(props: OptionsProps) {
         resolver: zodResolver(optionsFormSchema)
     })
 
-    const onSubmit = async (data: OptionsForm) => await savePrompt(data)
+    const onSubmit = async (data: OptionsForm) => await saveOptions(data)
 
-    const fetchCurrentPrompt = async () => {
-        const response = await fetch(`${serverUri}/api/v1/options/prompt`, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${props.userSession.token}`
+    const fetchCurrentValue = async (optionName: AvailableOption) => {
+        const response = await fetch(
+            `${serverUri}/api/v1/options/${optionName}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${props.userSession.token}`
+                }
             }
-        })
+        )
         if (!response.ok) {
-            console.error("Error on prompt get")
+            console.error(`Error on ${optionName} get`)
             return
         }
         const option: Option = await response.json()
-        setValue("prompt", option.value)
+        setValue(optionName, option.value)
     }
 
-    const savePrompt = async (form: OptionsForm) => {
-        const response = await fetch(`${serverUri}/api/v1/options/prompt`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${props.userSession.token}`
-            },
-            body: JSON.stringify({ value: form.prompt })
-        })
-        if (!response.ok) {
-            console.error("Error on prompt save")
+    const saveOptions = async (form: OptionsForm) => {
+        const savedOptionPromises = availableOptions.map((option) =>
+            saveOptionValue(option, form[option])
+        )
+        try {
+            const responses = await Promise.all(savedOptionPromises)
+            if (responses && responses.some((response) => !response.ok)) {
+                console.error("Error on options save")
+                return
+            }
+        } catch (error) {
+            console.error(error)
             return
         }
-        setValue("prompt", form.prompt)
-        alert("Prompt updated")
+        alert("Options saved with success")
+    }
+
+    const saveOptionValue = async (
+        optionName: AvailableOption,
+        value: string
+    ) => {
+        const response = await fetch(
+            `${serverUri}/api/v1/options/${optionName}`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${props.userSession.token}`
+                },
+                body: JSON.stringify({ value: value })
+            }
+        )
+        if (!response.ok) {
+            console.error(`Error on ${optionName} save`)
+            return response
+        }
+        setValue(optionName, value)
+        return response
     }
 
     useEffect(() => {
-        fetchCurrentPrompt()
+        availableOptions.forEach((option) => fetchCurrentValue(option))
     }, [])
 
     return (
@@ -87,14 +115,29 @@ function Options(props: OptionsProps) {
                 <div className="flex flex-col space-y-5 items-center w-full">
                     <div className="w-1/2">
                         <label
-                            htmlFor="prompt"
+                            htmlFor={PROMPT}
                             className="block text-sm mb-2 dark:text-white">
-                            Your prompt
+                            Prompt
                         </label>
                         <div className="relative w-full">
                             <textarea
-                                name="prompt"
-                                {...register("prompt", {
+                                name={PROMPT}
+                                {...register(PROMPT, {
+                                    required: true
+                                })}
+                                className="block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                required
+                            />
+                        </div>
+                        <label
+                            htmlFor={MATCH_THRESHOLD}
+                            className="block text-sm mb-2 dark:text-white">
+                            Match threshold
+                        </label>
+                        <div className="relative w-full">
+                            <input
+                                name={MATCH_THRESHOLD}
+                                {...register(MATCH_THRESHOLD, {
                                     required: true
                                 })}
                                 className="block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"

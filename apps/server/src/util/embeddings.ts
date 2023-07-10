@@ -20,7 +20,7 @@ async function generateEmbeddings(
         const input = painpoint.answer.replace(/\n/g, " ")
 
         const embeddingResponse = await openAi.createEmbedding({
-            model: "text-embedding-ada-002",
+            model: Analysis.EMBEDDING_MODEL,
             input
         })
 
@@ -56,7 +56,7 @@ async function searchEmbeddings(
 
     // Generate a one-time embedding for the query itself
     const embeddingResponse = await openai.createEmbedding({
-        model: "text-embedding-ada-002",
+        model: Analysis.EMBEDDING_MODEL,
         input
     })
 
@@ -114,7 +114,7 @@ async function searchEmbeddings(
     const prompt = getPrompt(option?.value, variables)
 
     const completionResponse = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
+        model: Analysis.LANGUAGE_MODEL,
         messages: [{ role: "system", content: prompt }],
         max_tokens: 512,
         temperature: 0.8
