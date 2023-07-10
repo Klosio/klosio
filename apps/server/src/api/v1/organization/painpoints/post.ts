@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { parse } from "papaparse"
 import { z } from "zod"
+import { Painpoints } from "~/constants/painpoints"
 import { painpointRepository } from "~/repository/painpointRepository"
 import { generateEmbeddings } from "~/util/embeddings"
 
@@ -44,11 +45,17 @@ async function PostPainpointsRequestHandler(
         painpoint: z
             .string()
             .min(1, "Painpoint should be more than 1 character")
-            .max(300, "Painpoint must be less than 300 characters"),
+            .max(
+                Painpoints.MAX_PROBLEM_SIZE,
+                `Painpoint must be less than ${Painpoints.MAX_PROBLEM_SIZE} characters`
+            ),
         answer: z
             .string()
             .min(1, "Answer should be more than 1 character")
-            .max(300, "Answer must be less than 300 characters")
+            .max(
+                Painpoints.MAX_ANSWER_SIZE,
+                `Answer must be less than ${Painpoints.MAX_ANSWER_SIZE} characters`
+            )
     })
 
     const data = parsedFile.data as z.infer<typeof painpointSchema>[]
