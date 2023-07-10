@@ -2,9 +2,9 @@ import { NextFunction, Request, Response } from "express"
 import { organizationRepository } from "~/repository/organizationRepository"
 
 const availableFields = ["id", "name", "domain"]
-type AvailableFields = (typeof availableFields)[number]
+type AvailableField = (typeof availableFields)[number]
 
-function isValid(fields: string[]): fields is AvailableFields[] {
+function isValid(fields: string[]): fields is AvailableField[] {
     return fields.every((field) => availableFields.includes(field))
 }
 

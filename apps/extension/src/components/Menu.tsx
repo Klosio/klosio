@@ -64,7 +64,9 @@ function Menu(props: MenuProps) {
                         className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold disabled:cursor-not-allowed disabled:bg-klosio-green-200 bg-klosio-green-300 text-white hover:bg-klosio-green-400 focus:outline-none focus:ring-2 focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
                         Start a meeting
                     </button>
-                    {userSession?.user?.role_id === "ORG_ADMIN" && (
+                    {["KLOSIO_ADMIN", "ORG_ADMIN"].includes(
+                        userSession?.user?.role_id
+                    ) && (
                         <>
                             <button
                                 onClick={() => navigate("/domainManagement")}
