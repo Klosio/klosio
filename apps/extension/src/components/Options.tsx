@@ -129,6 +129,8 @@ function Options(props: OptionsProps) {
                                 required
                             />
                         </div>
+                    </div>
+                    <div className="w-1/2">
                         <label
                             htmlFor={MATCH_THRESHOLD}
                             className="block text-sm mb-2 dark:text-white">
@@ -136,6 +138,7 @@ function Options(props: OptionsProps) {
                         </label>
                         <div className="relative w-full">
                             <input
+                                type="text"
                                 name={MATCH_THRESHOLD}
                                 {...register(MATCH_THRESHOLD, {
                                     required: true
@@ -150,7 +153,7 @@ function Options(props: OptionsProps) {
                         type="submit"
                         disabled={!isValid || isSubmitting}
                         className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                        Save prompt
+                        Save options
                     </button>
                 </div>
             </form>
