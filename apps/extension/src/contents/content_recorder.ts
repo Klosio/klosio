@@ -1,7 +1,13 @@
+import type { PlasmoCSConfig } from "plasmo"
 import RecordRTC from "recordrtc"
 import { httpRequest } from "~core/httpRequest"
 import type BattlecardResponse from "~types/battlecard.model"
 import type UserSession from "~types/userSession.model"
+
+// PlasmoCSConfig is the configuration object for the content script
+export const config: PlasmoCSConfig = {
+    matches: ["https://meet.google.com/*"]
+}
 
 async function startRecording(
     language: string,
