@@ -3,14 +3,17 @@ import { useEffect } from "react"
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
-import { supabase } from "~core/supabase"
-
 import "~/style.css"
 
 import AppHeader from "~components/AppHeader"
 import Options from "~components/Options"
 import OptionsUnauthorized from "~components/OptionsUnauthorized"
 import { httpRequest } from "~core/httpRequest"
+import {
+    addGetSessionListener,
+    isSessionExpired,
+    refreshUserSession
+} from "~core/session"
 import { AlertProvider } from "~providers/AlertProvider"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
@@ -26,34 +29,25 @@ function IndexOptions() {
     })
 
     const initUserSession = async () => {
-        if (!userSession) {
-            let session = await fetchUserSession()
-            if (!session) {
-                await setUserSession(null)
-                return
-            }
+        if (userSession && !isSessionExpired(userSession)) {
+            return
+        }
+        let session = await refreshUserSession()
+        if (!session) {
+            await setUserSession(null)
+            return
+        }
+        if (!userSession?.user) {
             try {
                 const user = await fetchUser(session)
                 session.user = user
             } catch (error) {
                 //console.error(error)
             }
-            await setUserSession(session)
         }
-    }
 
-    const fetchUserSession = async (): Promise<UserSession> => {
-        const { data, error } = await supabase.auth.getSession()
-
-        if (error) {
-            console.error(error)
-            return
-        }
-        const session = data.session
-        if (!session || !session.user) {
-            return
-        }
-        return { authId: session.user.id, token: session.access_token }
+        await setUserSession(session)
+        addGetSessionListener(session)
     }
 
     const fetchUser = async (session: UserSession): Promise<User> => {

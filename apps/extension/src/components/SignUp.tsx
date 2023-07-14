@@ -87,7 +87,10 @@ function SignUp() {
                 ok: true,
                 userSession: {
                     authId: session.user.id,
-                    token: session.access_token
+                    token: session.access_token,
+                    expiresAt: session.expires_at,
+                    refreshToken: session.refresh_token,
+                    remember: false
                 }
             }
         } catch (error) {

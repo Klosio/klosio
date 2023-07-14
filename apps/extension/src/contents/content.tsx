@@ -53,11 +53,9 @@ const PopupButton = () => {
                 sendResponse({ contentScriptReady: true })
             }
             if (request.script === "recording") {
-                console.log("Currently recording", isRecording)
                 sendResponse({ contentScriptRecording: isRecording })
             }
             if (request.recording === "start") {
-                console.log("Recording started in", request.language)
                 const { userSession, language } = request
                 if (
                     !userSession ||
@@ -65,7 +63,6 @@ const PopupButton = () => {
                     !userSession.user ||
                     !userSession.user.organization
                 ) {
-                    console.error("Missing session info")
                     return
                 }
                 setUserSession(userSession)
@@ -82,7 +79,6 @@ const PopupButton = () => {
                 sendResponse({ recordingStarted: true })
             }
             if (request.recording === "stop") {
-                console.log("Stop recording...")
                 cleanupRecording()
                 setIsRecording(false)
                 isRecording = false

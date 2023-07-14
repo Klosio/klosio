@@ -88,7 +88,6 @@ async function searchEmbeddings(
     }
 
     if (!embeddedPainpoints || !embeddedPainpoints.length) {
-        console.log(`no pain points for ${organizationId}`)
         return defaultResponse
     }
 

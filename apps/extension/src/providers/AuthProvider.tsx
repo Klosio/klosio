@@ -5,8 +5,11 @@ import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
 import { httpRequest } from "~core/httpRequest"
-import { addGetSessionListener } from "~core/session"
-import { supabase } from "~core/supabase"
+import {
+    addGetSessionListener,
+    isSessionExpired,
+    refreshUserSession
+} from "~core/session"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
 
@@ -30,35 +33,25 @@ export function AuthProvider({ children }) {
     const navigate = useNavigate()
 
     const initUserSession = async () => {
-        if (!userSession) {
-            let session = await fetchUserSession()
-            if (!session) {
-                await setUserSession(null)
-                return
-            }
+        if (userSession && !isSessionExpired(userSession)) {
+            return
+        }
+        let session = await refreshUserSession()
+        if (!session) {
+            await setUserSession(null)
+            return
+        }
+        if (!userSession?.user) {
             try {
                 const user = await fetchUser(session)
                 session.user = user
             } catch (error) {
                 //console.error(error)
             }
-            await setUserSession(session)
-            addGetSessionListener(session)
         }
-    }
 
-    const fetchUserSession = async (): Promise<UserSession> => {
-        const { data, error } = await supabase.auth.getSession()
-
-        if (error) {
-            console.error(error)
-            return
-        }
-        const session = data.session
-        if (!session || !session.user) {
-            return
-        }
-        return { authId: session.user.id, token: session.access_token }
+        await setUserSession(session)
+        addGetSessionListener(session)
     }
 
     const fetchUser = async (session: UserSession): Promise<User> => {

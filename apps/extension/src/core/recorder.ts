@@ -9,9 +9,6 @@ async function startRecording(language: string, userSession: UserSession) {
         language,
         userSession
     })
-    if (response.recordingStarted === true) {
-        console.log("Started recording.")
-    }
 }
 
 async function stopRecording() {
@@ -19,9 +16,6 @@ async function stopRecording() {
     const response = await chrome.tabs.sendMessage(tab.id, {
         recording: "stop"
     })
-    if (response.recordingStopped === true) {
-        console.log("Stopped recording.")
-    }
 }
 
 async function isRecording(): Promise<boolean> {
