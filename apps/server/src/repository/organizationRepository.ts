@@ -94,7 +94,6 @@ const organizationRepository: OrganizationRepository = {
         organization: Organization,
         domain: string
     ): Promise<void> {
-        console.log(organization.id, domain)
         const { error } = await supabaseClient
             .from("organizations")
             .update({ domain: domain })

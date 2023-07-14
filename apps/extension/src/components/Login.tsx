@@ -30,7 +30,7 @@ const loginFormSchema = z.object({
 
 type LoginForm = z.infer<typeof loginFormSchema>
 
-function LoginMenu() {
+function Login() {
     const { login } = useAuth()
     const { showErrorMessage, hideErrorMessages } = useAlert()
 
@@ -50,7 +50,11 @@ function LoginMenu() {
     }
 
     const submitSignIn = async (form: LoginForm) => {
-        const response = await handleEmailLogin(form.email, form.password)
+        const response = await handleEmailLogin(
+            form.email,
+            form.password,
+            form.remember
+        )
         if (!response.ok) {
             await showErrorMessage(response.errorCode)
             return
@@ -60,9 +64,10 @@ function LoginMenu() {
 
     const handleEmailLogin = async (
         username: string,
-        password: string
+        password: string,
+        remember: boolean
     ): Promise<EmailLoginResponse> => {
-        const response = await authEmailLogin(username, password)
+        const response = await authEmailLogin(username, password, remember)
         if (!response.ok) {
             return response
         }
@@ -79,7 +84,8 @@ function LoginMenu() {
 
     const authEmailLogin = async (
         username: string,
-        password: string
+        password: string,
+        remember: boolean
     ): Promise<EmailLoginResponse> => {
         try {
             const {
@@ -103,7 +109,10 @@ function LoginMenu() {
                 ok: true,
                 userSession: {
                     authId: session.user.id,
-                    token: session.access_token
+                    token: session.access_token,
+                    expiresAt: session.expires_at,
+                    refreshToken: session.refresh_token,
+                    remember: remember
                 }
             }
         } catch (error) {
@@ -222,4 +231,4 @@ function LoginMenu() {
     )
 }
 
-export default LoginMenu
+export default Login

@@ -17,5 +17,6 @@ export const ERRORS: Record<ErrorCode, string> = {
     EXISTING_NAME: "This name already exists.",
     EXISTING_EMAIL: "This email address already exists.",
     // SUPABASE ERRORS
-    INVALID_CREDENTIALS: "Invalid credentials."
+    INVALID_CREDENTIALS: "Invalid credentials.",
+    EXPIRED_SESSION: "Your session has expired. Please sign in again."
 }

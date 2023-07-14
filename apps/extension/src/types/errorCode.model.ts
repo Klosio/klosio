@@ -10,3 +10,5 @@ export type ErrorCode =
     | "INCORRECT_TEMPLATE"
     | "EXISTING_NAME"
     | "EXISTING_EMAIL"
+    | "INVALID_CREDENTIALS"
+    | "EXPIRED_SESSION"

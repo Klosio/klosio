@@ -10,7 +10,6 @@ async function addContentScript(scriptPath: string, tab: chrome.tabs.Tab) {
     if (await isContentScriptReady()) {
         return
     }
-    console.log("Add content script...", tab.id)
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: [scriptPath]

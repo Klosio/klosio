@@ -70,7 +70,6 @@ function startAudioRecorder(
         },
         onstop: () => {
             stream.getTracks().forEach((track) => track.stop())
-            console.log("Stopped recording")
         },
         onbeforeunload: () => {
             if (audioRecorder) {

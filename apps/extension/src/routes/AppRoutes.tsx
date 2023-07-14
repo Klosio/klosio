@@ -4,7 +4,6 @@ import DomainManagement from "~components/DomainManagement"
 import EmailManagement from "~components/EmailManagement"
 import LandingPage from "~components/LandingPage"
 import LanguageSelection from "~components/LanguageSelection"
-import LoginMenu from "~components/LoginMenu"
 import Menu from "~components/Menu"
 import OrganizationCreation from "~components/OrganizationCreation"
 import ProvideContext from "~components/ProvideContext"
@@ -14,6 +13,7 @@ import { isLoggedIn } from "~core/session"
 import { useAuth } from "~providers/AuthProvider"
 
 import { useEffect } from "react"
+import Login from "~components/Login"
 import { useAlert } from "~providers/AlertProvider"
 import RoleGuard from "./RoleGuard"
 import RouteGuard from "./RouteGuard"
@@ -60,7 +60,7 @@ function AppRoutes(props: AppRoutesProps) {
                 path="/login"
                 element={
                     <RouteGuard isAccessible={!isUserLoggedIn}>
-                        <LoginMenu />
+                        <Login />
                     </RouteGuard>
                 }
             />
