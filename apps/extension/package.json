@@ -2,7 +2,7 @@
   "name": "extension",
   "displayName": "Klosio - Battlecards AI",
   "version": "0.0.1",
-  "description": "Chrome extension that aims to assist commercial professionals, in improving their sales skills",
+  "description": "Chrome extension that aims to assist salespersons in improving their sales skills",
   "author": "Klosio",
   "packageManager": "npm@9.5.1",
   "scripts": {
@@ -42,19 +42,8 @@
     "typescript": "5.0.4"
   },
   "manifest": {
-    "key": "$CRX_KEY",
-    "host_permissions": [
-      "https://*/*"
-    ],
     "permissions": [
       "activeTab",
-      "webRequest",
-      "webRequestBlocking",
-      "webNavigation",
-      "webAudio",
-      "desktopCapture",
-      "audioCapture",
-      "videoCapture",
       "storage",
       "scripting"
     ]

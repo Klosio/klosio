@@ -3,7 +3,7 @@ import { getUserSession } from "~core/session"
 
 export const httpRequest = axios.create({
     baseURL: `${process.env.PLASMO_PUBLIC_SERVER_URL}/api`,
-    timeout: 10000,
+    timeout: 25000,
     headers: {
         "Content-Type": "application/json"
     }
