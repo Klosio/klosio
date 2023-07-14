@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { businessContextRepository } from "~/repository/businessContextRepository"
 import { painpointRepository } from "~/repository/painpointRepository"
+import CustomError from "~/types/CustomError"
 
 async function GetReadyRequestHandler(
     req: Request,
@@ -10,8 +11,11 @@ async function GetReadyRequestHandler(
     const organizationId = req.params.id
 
     if (!organizationId) {
-        res.status(404)
-        return next(new Error("Organization param not found"))
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Organization param not found"
+        } as CustomError)
     }
 
     try {
@@ -28,10 +32,9 @@ async function GetReadyRequestHandler(
         }
 
         return res.status(200).json({ ready })
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
         res.status(500)
-        return next(err)
+        return next(error)
     }
 }
 

@@ -8,12 +8,15 @@ import { useAuth } from "~providers/AuthProvider"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
+import type { ErrorCode } from "~types/errorCode.model"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 
 interface EmailLoginResponse {
     ok: boolean
     userSession?: UserSession
-    message?: string
+    errorCode?: ErrorCode
 }
 
 const loginFormSchema = z.object({
@@ -27,10 +30,9 @@ const loginFormSchema = z.object({
 
 type LoginForm = z.infer<typeof loginFormSchema>
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function LoginMenu() {
     const { login } = useAuth()
+    const { showErrorMessage, hideErrorMessages } = useAlert()
 
     const {
         register,
@@ -42,13 +44,15 @@ function LoginMenu() {
         resolver: zodResolver(loginFormSchema)
     })
 
-    const onSubmit: SubmitHandler<LoginForm> = async (data) =>
+    const onSubmit: SubmitHandler<LoginForm> = async (data) => {
+        await hideErrorMessages()
         await submitSignIn(data)
+    }
 
     const submitSignIn = async (form: LoginForm) => {
         const response = await handleEmailLogin(form.email, form.password)
         if (!response.ok) {
-            alert(response.message)
+            await showErrorMessage(response.errorCode)
             return
         }
         await login(response.userSession)
@@ -62,13 +66,14 @@ function LoginMenu() {
         if (!response.ok) {
             return response
         }
-        const user = await fetchUser(response.userSession)
-        if (!user) {
-            return { ok: false, message: "An error occured, please try again." }
-        }
-        return {
-            ok: true,
-            userSession: { ...response.userSession, user: user }
+        try {
+            const user = await fetchUser(response.userSession)
+            return {
+                ok: true,
+                userSession: { ...response.userSession, user: user }
+            }
+        } catch (error) {
+            return { ok: false, errorCode: error.response.data.code }
         }
     }
 
@@ -86,8 +91,12 @@ function LoginMenu() {
             })
 
             if (error) {
-                console.error(`Error with auth: ${error.message}`)
-                return { ok: false, message: error.message }
+                switch (error.message) {
+                    case "Invalid login credentials":
+                        return { ok: false, errorCode: "INVALID_CREDENTIALS" }
+                    default:
+                        return { ok: false, errorCode: "UNKNOWN" }
+                }
             }
 
             return {
@@ -98,26 +107,20 @@ function LoginMenu() {
                 }
             }
         } catch (error) {
-            console.error(error)
-            return { ok: false, message: "An error occured, please try again." }
+            return { ok: false, errorCode: "UNKNOWN" }
         }
     }
 
     const fetchUser = async (userSession: UserSession): Promise<User> => {
-        const response = await fetch(
-            `${serverUri}/api/v1/users/auth-id/${userSession.authId}`,
+        const response = await httpRequest.get(
+            `/v1/users/auth-id/${userSession.authId}`,
             {
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${userSession.token}`
                 }
             }
         )
-        if (!response.ok) {
-            console.error("Error on user get")
-            return
-        }
-        return await response.json()
+        return response.data as User
     }
 
     return (

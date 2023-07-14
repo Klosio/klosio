@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { organizationRepository } from "~/repository/organizationRepository"
+import CustomError from "~/types/CustomError"
 
 const availableFields = ["id", "name", "domain"]
 type AvailableField = (typeof availableFields)[number]
@@ -16,8 +17,11 @@ async function GetOrganizationRequestHandler(
     const id = req.params.id
 
     if (!id) {
-        res.status(404)
-        return next(new Error("Organization id param not found"))
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Organization id missing in params"
+        } as CustomError)
     }
 
     const fieldsQuery = req.query.fields
@@ -27,21 +31,26 @@ async function GetOrganizationRequestHandler(
             const fields = fieldsQuery.split(",")
             if (!isValid(fields)) {
                 res.status(400)
-                return next(new Error("Invalid field name"))
+                return next({
+                    code: "INVALID_FIELD_NAME",
+                    message: "Invalid field name"
+                } as CustomError)
             }
             if (!fields.includes("domain")) {
                 res.status(400)
-                return next(new Error("Only domain field is supported"))
+                return next({
+                    code: "INVALID_FIELD_NAME",
+                    message: "Only domain field is supported"
+                } as CustomError)
             }
             const domain = await organizationRepository.getDomain(id)
             return res.status(200).json({ domain })
         }
         const organization = await organizationRepository.find(id)
         return res.status(200).json(organization)
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
         res.status(500)
-        return next(err)
+        return next(error)
     }
 }
 

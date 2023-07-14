@@ -1,32 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm, type SubmitHandler } from "react-hook-form"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { z } from "zod"
 
 import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
 import { emailManagementFormSchema } from "~validation/emailManagementForm.schema"
 import Info from "./Info"
-import SuccessAlert from "./SuccessAlert"
 
 type EmailManagementForm = z.infer<typeof emailManagementFormSchema>
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function DomainManagement() {
-    const [showSuccess, setShowSuccess] = useState(false)
-    const [showError, setShowError] = useState(false)
-
     const { userSession } = useAuth()
-
-    const showAlert = (setState: Function) => {
-        setState(true)
-        setTimeout(() => {
-            setState(false)
-        }, 5000)
-    }
+    const { showErrorMessage, showSuccessMessage, hideErrorMessages } =
+        useAlert()
+    const navigate = useNavigate()
 
     const {
         register,
@@ -44,59 +36,44 @@ function DomainManagement() {
     const fetchDefaultDomain = async () => {
         const id = userSession?.user?.organization?.id
         if (id) {
-            const response = await fetch(
-                `${serverUri}/api/v1/organizations/${id}?fields=domain`,
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${userSession.token}`
-                    }
-                }
-            )
-            if (!response.ok) {
-                console.error("Error on email domain get")
-                return
+            try {
+                const response = await httpRequest.get(
+                    `/v1/organizations/${id}?fields=domain`
+                )
+                const organization = response.data as Partial<Organization>
+                setValue("domain", organization.domain)
+            } catch (error) {
+                await showErrorMessage(error.response.data.code)
             }
-            const organization: Partial<Organization> = await response.json()
-            setValue("domain", organization.domain)
         }
     }
 
-    const onSubmit: SubmitHandler<EmailManagementForm> = async (data) =>
-        await saveDomain(userSession?.user?.organization, data.domain).then(
-            async (response) => {
-                if (response.status === 204) {
-                    showAlert(setShowSuccess)
-                    await fetchDefaultDomain()
-                } else {
-                    showAlert(setShowError)
-                }
-            }
-        )
+    const onSubmit: SubmitHandler<EmailManagementForm> = async (data) => {
+        await hideErrorMessages()
+        try {
+            const response = await saveDomain(
+                userSession?.user?.organization,
+                data.domain
+            )
+            await showSuccessMessage("Email domain saved with success.")
+            navigate("/menu")
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
+        }
+    }
 
     const saveDomain = async (
         organization: Organization,
         domain: string
     ): Promise<Response> => {
-        return await fetch(
-            `${serverUri}/api/v1/organizations/${organization.id}/domain`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: JSON.stringify({ domain })
-            }
+        return await httpRequest.post(
+            `/v1/organizations/${organization.id}/domain`,
+            { domain }
         )
     }
 
     return (
         <div className="flex flex-col items-center justify-center w-full space-y-3">
-            {showSuccess && (
-                <SuccessAlert message="Your domain has been sucessfully saved." />
-            )}
-            {showError && <>Error</>}
             <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
                 Manage users
             </h1>

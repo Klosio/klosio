@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom"
 import { Storage } from "@plasmohq/storage"
 import { useStorage } from "@plasmohq/storage/hook"
 
+import { httpRequest } from "~core/httpRequest"
 import { addGetSessionListener } from "~core/session"
 import { supabase } from "~core/supabase"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
 
 const AuthContext = createContext(null)
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
 interface Auth {
     userSession: UserSession
@@ -36,12 +36,12 @@ export function AuthProvider({ children }) {
                 await setUserSession(null)
                 return
             }
-            const user = await fetchUser(session)
-            if (!user) {
-                await setUserSession(null)
-                return
+            try {
+                const user = await fetchUser(session)
+                session.user = user
+            } catch (error) {
+                //console.error(error)
             }
-            session.user = user
             await setUserSession(session)
             addGetSessionListener(session)
         }
@@ -62,20 +62,15 @@ export function AuthProvider({ children }) {
     }
 
     const fetchUser = async (session: UserSession): Promise<User> => {
-        const response = await fetch(
-            `${serverUri}/api/v1/users/auth-id/${session.authId}`,
+        const response = await httpRequest.get(
+            `/v1/users/auth-id/${session.authId}`,
             {
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${session.token}`
                 }
             }
         )
-        if (!response.ok) {
-            console.error("Error on user get")
-            return
-        }
-        return (await response.json()) as User
+        return response.data as User
     }
 
     useEffect(() => {

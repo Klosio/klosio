@@ -1,6 +1,14 @@
 import type UserSession from "~types/userSession.model"
 
+import { Storage } from "@plasmohq/storage"
 import { isGoogleMeetURL } from "./browser"
+
+async function getUserSession(): Promise<UserSession> {
+    const storage = new Storage({
+        area: "local"
+    })
+    return (await storage.get("user")) as UserSession
+}
 
 function isLoggedIn(userSession: UserSession): boolean {
     return userSession ? !!userSession.user : false
@@ -19,4 +27,4 @@ function addGetSessionListener(userSession: UserSession) {
     })
 }
 
-export { isLoggedIn, addGetSessionListener }
+export { getUserSession, isLoggedIn, addGetSessionListener }

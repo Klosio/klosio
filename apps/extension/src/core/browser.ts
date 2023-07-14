@@ -3,7 +3,6 @@ async function getCurrentTab(): Promise<chrome.tabs.Tab> {
         active: true,
         lastFocusedWindow: true
     })
-    console.log(`current tab ${tab.id}`)
     return tab
 }
 

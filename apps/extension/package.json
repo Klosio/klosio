@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^3.1.1",
     "@plasmohq/storage": "^1.6.0",
     "@supabase/supabase-js": "^2.25.0",
+    "axios": "^1.4.0",
     "file-saver": "^2.0.5",
     "inline-worker": "^1.1.0",
     "plasmo": "^0.73.2",

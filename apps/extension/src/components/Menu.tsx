@@ -2,21 +2,22 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
 import LoginStatus from "~components/LoginStatus"
+import { httpRequest } from "~core/httpRequest"
 import { isRecording, isRecordingAllowed } from "~core/recorder"
 import { supabase } from "~core/supabase"
+import { useAlert } from "~providers/AlertProvider"
 import { useAuth } from "~providers/AuthProvider"
 
 interface MenuProps {
     currentTab: chrome.tabs.Tab
 }
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function Menu(props: MenuProps) {
     const navigate = useNavigate()
     const { userSession, logout } = useAuth()
+    const { showErrorMessage } = useAlert()
 
-    const [record, setRecord] = useState(true)
+    const [record, setRecord] = useState(false)
     const [isReady, setIsReady] = useState(false)
 
     const handleLogout = async () => {
@@ -24,27 +25,24 @@ function Menu(props: MenuProps) {
         await logout()
     }
 
-    const fetchOrganizationState = async () =>
-        await fetch(
-            `${serverUri}/api/v1/organizations/${userSession?.user?.organization?.id}/ready`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                }
-            }
-        )
-            .then((response) => response.json())
-            .then((data) => {
-                setIsReady(data.ready)
-            })
+    const fetchOrganizationState = async () => {
+        try {
+            const response = await httpRequest.get(
+                `/v1/organizations/${userSession?.user?.organization?.id}/ready`
+            )
+            setIsReady(response.data.ready)
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
+        }
+    }
 
     useEffect(() => {
         const updateRecordingStatus = async () => {
             const recordingStatus = await isRecording()
             setRecord(recordingStatus)
-            await fetchOrganizationState()
+            if (userSession?.user?.organization) {
+                await fetchOrganizationState()
+            }
         }
         updateRecordingStatus()
     }, [userSession])

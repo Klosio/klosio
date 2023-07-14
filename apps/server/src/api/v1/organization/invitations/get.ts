@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import invitationsRepository from "~/repository/invitationRepository"
+import CustomError from "~/types/CustomError"
 
 const GetInvitationRequestHandler = async (
     req: Request<{ id: string }>,
@@ -9,19 +10,19 @@ const GetInvitationRequestHandler = async (
     const { id } = req.params
 
     if (!id) {
-        res.status(400).json({ message: "Id is required" })
-        return
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Id param not found"
+        } as CustomError)
     }
 
     try {
-        const organization = await invitationsRepository.getByOrganization(
-            id,
-            false
-        )
-        return res.status(200).json(organization)
+        const invitation = await invitationsRepository.getByOrganization(id)
+        return res.status(200).json(invitation)
     } catch (error) {
-        console.error(error)
-        next(error)
+        res.status(500)
+        return next(error)
     }
 }
 

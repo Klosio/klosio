@@ -2,6 +2,7 @@ import { Deepgram } from "@deepgram/sdk"
 import dotenv from "dotenv"
 import { NextFunction, Request, Response } from "express"
 import { Analysis } from "~/constants/analysis"
+import CustomError from "~/types/CustomError"
 import { searchEmbeddings } from "~/util/embeddings"
 import getEnvVar from "~/util/env"
 import supportedLanguages from "~/util/supportedLanguages"
@@ -36,15 +37,24 @@ async function PostAnalysisRequestHandler(
 ) {
     if (!req.params.language || !supportedLanguages.has(req.params.language)) {
         res.status(400)
-        return next(new Error("No language specified in request params"))
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "No language specified in request params"
+        } as CustomError)
     }
     if (!req.params.organizationId) {
         res.status(400)
-        return next(new Error("No organization specified in request params"))
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "No organization specified in request params"
+        } as CustomError)
     }
     if (!req.file) {
         res.status(400)
-        return next(new Error("No audio file provided in the request"))
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "No audio file provided in the request"
+        } as CustomError)
     }
 
     try {
@@ -56,8 +66,11 @@ async function PostAnalysisRequestHandler(
             !deepgramResult ||
             deepgramResult.split(" ").length <= Analysis.MIN_WORDS
         ) {
-            res.status(400)
-            return next(new Error("No transcript returned by the API"))
+            res.status(500)
+            return next({
+                code: "UNKNOWN",
+                message: "No transcript returned by the API"
+            } as CustomError)
         }
         const result = await searchEmbeddings(
             deepgramResult,
@@ -65,9 +78,8 @@ async function PostAnalysisRequestHandler(
         )
         return res.status(200).json(result)
     } catch (error) {
-        console.error(error)
-        res.status(400)
-        return next(new Error("Error when calling the transcription API"))
+        res.status(500)
+        return next(error)
     }
 }
 
