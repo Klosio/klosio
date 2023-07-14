@@ -5,25 +5,28 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { type z } from "zod"
 
-import WarningSvg from "react:~/assets/svg/warning.svg"
 import { useAuth } from "~providers/AuthProvider"
 import type BusinessContext from "~types/businessContext.model"
 import type Organization from "~types/organization.model"
 import { businessContextFormSchema } from "~validation/businessContextForm.schema"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 import Info from "./Info"
 import Warning from "./Warning"
-
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
 type BusinessContextForm = z.infer<typeof businessContextFormSchema>
 
 function ProvideContext() {
     const [csvFile, setCsvFile] = useState<File>(null)
-    const [uploadError, setUploadError] = useState(false)
     const [businessContext, setBusinessContext] =
         useState<BusinessContext>(null)
+
+    const { userSession } = useAuth()
+    const { showErrorMessage, showSuccessMessage, hideErrorMessages } =
+        useAlert()
+    const navigate = useNavigate()
 
     const {
         register,
@@ -39,31 +42,18 @@ function ProvideContext() {
         }
     })
 
-    const { userSession } = useAuth()
-
-    const navigate = useNavigate()
-
     const onSubmit = async (form: BusinessContextForm) => {
-        setUploadError(false)
+        await hideErrorMessages()
         const organization = userSession.user.organization
         const businessContextPromise = saveBusinessContext(organization, form)
         const painpointsPromise = savePainpoints(organization)
         try {
-            const responses = await Promise.all([
-                painpointsPromise,
-                businessContextPromise
-            ])
-            if (responses && responses.some((response) => !response.ok)) {
-                console.error("Error on business context save")
-                setUploadError(true)
-                return
-            }
+            await Promise.all([painpointsPromise, businessContextPromise])
         } catch (error) {
-            console.error(error)
-            setUploadError(true)
+            await showErrorMessage(error.response.data.code)
             return
         }
-        alert("Business context saved with success")
+        await showSuccessMessage("Business context saved with success.")
         navigate("/menu")
     }
 
@@ -72,14 +62,13 @@ function ProvideContext() {
     ): Promise<Response> => {
         const formData = new FormData()
         formData.append("file", csvFile)
-        return await fetch(
-            `${serverUri}/api/v1/organizations/${organization.id}/painpoints`,
+        return await httpRequest.post(
+            `/v1/organizations/${organization.id}/painpoints`,
+            formData,
             {
-                method: "POST",
                 headers: {
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: formData
+                    "Content-Type": "multipart/form-data"
+                }
             }
         )
     }
@@ -89,16 +78,9 @@ function ProvideContext() {
         form: BusinessContextForm
     ): Promise<Response> => {
         const { battlecards, ...businessContextForm } = form
-        return await fetch(
-            `${serverUri}/api/v1/organizations/${organization.id}/business-context`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: JSON.stringify(businessContextForm)
-            }
+        return await httpRequest.post(
+            `/v1/organizations/${organization.id}/business-context`,
+            businessContextForm
         )
     }
 
@@ -107,16 +89,9 @@ function ProvideContext() {
         form: BusinessContextForm
     ): Promise<Response> => {
         const { battlecards, ...businessContextForm } = form
-        return await fetch(
-            `${serverUri}/api/v1/organizations/${organization.id}/business-context/${businessContext.id}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: JSON.stringify(businessContextForm)
-            }
+        return await httpRequest.put(
+            `/v1/organizations/${organization.id}/business-context/${businessContext.id}`,
+            businessContextForm
         )
     }
 
@@ -132,30 +107,24 @@ function ProvideContext() {
 
     const fetchBusinessContext = async () => {
         const organizationId = userSession.user.organization.id
-        const response = await fetch(
-            `${serverUri}/api/v1/organizations/${organizationId}/business-context`,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                }
-            }
-        )
-        if (!response.ok) {
-            console.error("Error on business context get")
-            return
-        }
-        const businessContexts: BusinessContext[] = await response.json()
-        if (!businessContexts || !businessContexts.length) {
-            return
-        }
-        if (businessContexts.length > 1) {
-            console.error(
-                `Multiple business contexts per organization not supported for now, taking the first found for organization ${organizationId}`
+        try {
+            const response = await httpRequest.get(
+                `/v1/organizations/${organizationId}/business-context`
             )
+            const businessContexts = response.data as BusinessContext[]
+            if (!businessContexts || !businessContexts.length) {
+                return
+            }
+            if (businessContexts.length > 1) {
+                console.error(
+                    `Multiple business contexts per organization not supported for now, taking the first found for organization ${organizationId}`
+                )
+            }
+            setBusinessContext(businessContexts[0])
+            reset(businessContexts[0])
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
         }
-        setBusinessContext(businessContexts[0])
-        reset(businessContexts[0])
     }
 
     useEffect(() => {
@@ -165,17 +134,6 @@ function ProvideContext() {
     return (
         <>
             <div className="flex flex-col w-full">
-                {uploadError && (
-                    <div
-                        className="flex items-center bg-red-400 text-xs text-white rounded-md p-2"
-                        role="alert">
-                        <WarningSvg className="w-[20px] m-2" />
-                        <p className="w-11/12">
-                            Error during battlecards import. The .csv file
-                            provided doesn’t correspond to the expected format.
-                        </p>
-                    </div>
-                )}
                 <div className="text-center">
                     <h1 className="block text-2xl font-bold text-gray-800 dark:text-white">
                         Provide context

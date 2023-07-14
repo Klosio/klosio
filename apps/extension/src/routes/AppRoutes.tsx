@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, useLocation } from "react-router-dom"
 
 import DomainManagement from "~components/DomainManagement"
 import EmailManagement from "~components/EmailManagement"
@@ -10,8 +10,11 @@ import OrganizationCreation from "~components/OrganizationCreation"
 import ProvideContext from "~components/ProvideContext"
 import SignUp from "~components/SignUp"
 import { isRecordingAllowed, startRecording } from "~core/recorder"
+import { isLoggedIn } from "~core/session"
 import { useAuth } from "~providers/AuthProvider"
 
+import { useEffect } from "react"
+import { useAlert } from "~providers/AlertProvider"
 import RoleGuard from "./RoleGuard"
 import RouteGuard from "./RouteGuard"
 
@@ -21,7 +24,18 @@ interface AppRoutesProps {
 
 function AppRoutes(props: AppRoutesProps) {
     const { userSession } = useAuth()
-    const isUserLoggedIn = userSession ? !!userSession.user : false
+    const { hideErrorMessages } = useAlert()
+    let location = useLocation()
+    const isUserLoggedIn = isLoggedIn(userSession)
+
+    const removeAlertsOnRouteChange = async () => {
+        await hideErrorMessages()
+    }
+
+    useEffect(() => {
+        removeAlertsOnRouteChange()
+    }, [location])
+
     return (
         <Routes>
             <Route

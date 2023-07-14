@@ -4,8 +4,20 @@ import { supabaseClient } from "~/util/supabase"
 
 interface UserRepository {
     findByAuthId(authId: string): Promise<User>
+    existsByEmail(email: string): Promise<boolean>
     create(user: Omit<User, "id">): Promise<User>
     update(user: User): Promise<User>
+}
+
+// in the data organizations is typed as an array but returns a single organization
+function refineData(data: any): User {
+    if (data?.organizations) {
+        const { organizations, ...rest } = data
+        const user = rest as User
+        user.organization = organizations as Organization
+        return user
+    }
+    return data as User
 }
 
 const userRepository: UserRepository = {
@@ -22,17 +34,30 @@ const userRepository: UserRepository = {
                 { cause: error }
             )
         }
-        const { organizations, ...rest } = data
-        const user = rest as User
-        // result is typed as an array but returns a single organization
-        user.organization = organizations as unknown as Organization
-        return user
+        return refineData(data)
     },
-    async create(user: Omit<User, "id">): Promise<User> {
+    async existsByEmail(email: string): Promise<boolean> {
         const { data, error } = await supabaseClient
             .from("users")
-            .insert(user)
-            .select()
+            .select("id")
+            .eq("email", email)
+            .maybeSingle()
+
+        if (error) {
+            throw new Error(
+                `Error when checking existence of user with email ${email}`,
+                { cause: error }
+            )
+        }
+
+        return !!data
+    },
+    async create(user: Omit<User, "id">): Promise<User> {
+        const { organization, ...rest } = user
+        const { data, error } = await supabaseClient
+            .from("users")
+            .insert({ ...rest, organization_id: organization?.id })
+            .select("id, email, auth_id, role_id, organizations ( id, name )")
             .single()
 
         if (error) {
@@ -41,7 +66,7 @@ const userRepository: UserRepository = {
                 { cause: error }
             )
         }
-        return data
+        return refineData(data)
     },
     async update(user: User): Promise<User> {
         const { data, error } = await supabaseClient
@@ -61,12 +86,7 @@ const userRepository: UserRepository = {
             })
         }
 
-        const refinedData = Object.fromEntries(
-            Object.entries(data).map(([k, v]) =>
-                k !== "organizations" ? [k, v] : ["organization", v]
-            )
-        ) as User
-        return refinedData
+        return refineData(data)
     }
 }
 

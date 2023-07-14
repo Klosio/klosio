@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express"
+import CustomError from "~/types/CustomError"
 import { supabaseClient } from "~/util/supabase"
 
 const PostInvitationRequestHandler = async (
@@ -9,15 +10,21 @@ const PostInvitationRequestHandler = async (
     const { id } = req.params
 
     if (!id) {
-        res.status(400).json({ message: "Id is required" })
-        return
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Id param not found"
+        } as CustomError)
     }
 
     const { emails } = req.body
 
     if (!emails) {
-        res.status(400).json({ message: "emails are required" })
-        return
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Emails are required"
+        } as CustomError)
     }
 
     const { data: organization, error: organizationError } =
@@ -28,11 +35,16 @@ const PostInvitationRequestHandler = async (
             .single()
 
     if (!organization) {
-        return res.status(404).send()
+        res.status(404)
+        return next({
+            code: "NOT_FOUND",
+            message: `No organization found with id ${id}`
+        } as CustomError)
     }
 
     if (organizationError) {
-        return res.status(500).send()
+        res.status(500)
+        return next(organizationError)
     }
 
     // delete all invitations for this organization
@@ -42,7 +54,7 @@ const PostInvitationRequestHandler = async (
         .eq("organization_id", organization.id)
 
     if (deleteError) {
-        console.error(deleteError)
+        res.status(500)
         return next(deleteError)
     }
 
@@ -57,7 +69,7 @@ const PostInvitationRequestHandler = async (
         .select()
 
     if (insertInvitationsError) {
-        console.error(insertInvitationsError)
+        res.status(500)
         return next(insertInvitationsError)
     }
 

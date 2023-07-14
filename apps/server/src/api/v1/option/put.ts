@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { optionRepository } from "~/repository/optionRepository"
+import CustomError from "~/types/CustomError"
 
 async function PutOptionRequestHandler(
     req: Request<{ name: string }>,
@@ -9,7 +10,10 @@ async function PutOptionRequestHandler(
     const { name } = req.params
     if (!name) {
         res.status(400)
-        return next(new Error("No name specified for option"))
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "No name specified for option"
+        } as CustomError)
     }
 
     let existing = true
@@ -31,10 +35,9 @@ async function PutOptionRequestHandler(
             return res.status(201).json(savedOption)
         }
         return res.status(200).json(savedOption)
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
         res.status(500)
-        return next(err)
+        return next(error)
     }
 }
 

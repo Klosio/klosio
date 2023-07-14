@@ -6,6 +6,7 @@ import { MemoryRouter } from "react-router-dom"
 
 import AppHeader from "~components/AppHeader"
 import { getCurrentTab } from "~core/browser"
+import { AlertProvider } from "~providers/AlertProvider"
 import { AuthProvider } from "~providers/AuthProvider"
 import AppRoutes from "~routes/AppRoutes"
 
@@ -23,9 +24,9 @@ function IndexPopup() {
             <AuthProvider>
                 <div className="m-2 w-[350px] space-y-2 flex flex-col bg-white border shadow-sm rounded-xl p-4 md:p-5">
                     <AppHeader backLink />
-                    <div>
+                    <AlertProvider>
                         <AppRoutes currentTab={currentTab} />
-                    </div>
+                    </AlertProvider>
                 </div>
             </AuthProvider>
         </MemoryRouter>

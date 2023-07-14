@@ -4,6 +4,7 @@ import { z } from "zod"
 import { useAuth } from "~providers/AuthProvider"
 import type UserSession from "~types/userSession.model"
 
+import { useAlert } from "~providers/AlertProvider"
 import type { Languages } from "~types/languages.model"
 import { languageFormSchema } from "~validation/languageForm.schema"
 
@@ -28,9 +29,13 @@ function LanguageSelection(props: LanguageSelectionProps) {
     })
 
     const { userSession } = useAuth()
+    const { showSuccessMessage, hideErrorMessages } = useAlert()
 
-    const onSubmit: SubmitHandler<LanguageForm> = (data) =>
+    const onSubmit: SubmitHandler<LanguageForm> = async (data) => {
+        await hideErrorMessages()
         startMeeting(data.country, userSession)
+        await showSuccessMessage("Meeting started with success.")
+    }
 
     const startMeeting = (countryCode: string, userSession: UserSession) => {
         props.startRecording(countryCode, userSession)

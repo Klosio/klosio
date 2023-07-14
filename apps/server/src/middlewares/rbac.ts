@@ -14,8 +14,10 @@ const verifyKlosioUser = async (
         } = req
 
         if (authStatus !== "authenticated") {
-            res.status(401)
-            next(new Error("User is not authenticated"))
+            return res.status(401).json({
+                code: "UNAUTHORIZED",
+                message: "Not authenticated"
+            })
         }
         const user = await userRepository.findByAuthId(userId).catch(() => {
             return { role_id: "GUEST" }
@@ -35,9 +37,11 @@ const permit =
     async (req: any, res: Response, next: NextFunction) => {
         const user = req.klosioUser
         if (!user || !permittedRoles.includes(user.role_id)) {
-            res.status(403)
             req.klosioUser.accessGranted = false
-            next(new Error("User is not authorized to access this resource"))
+            return res.status(403).json({
+                code: "FORBIDDEN",
+                message: "Not authorized to access this resource"
+            })
         }
         req.klosioUser.accessGranted = true
         next()
@@ -51,8 +55,10 @@ const verifyAccessGranted = async (
     // If accessGranted is not setted, that mean user is not allowed to access this resource
     // Prevent an omission of permit middleware
     if (!req.klosioUser.accessGranted) {
-        res.status(403)
-        next(new Error("User is not authorized to access this resource"))
+        return res.status(403).json({
+            code: "FORBIDDEN",
+            message: "Not authorized to access this resource"
+        })
     }
     next()
 }

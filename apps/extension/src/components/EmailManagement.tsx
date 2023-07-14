@@ -1,13 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
 import { useFieldArray, useForm, type SubmitHandler } from "react-hook-form"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import DeleteSvg from "react:~assets/svg/delete.svg"
 import UserPlusSvg from "react:~assets/svg/user-plus.svg"
 import { z } from "zod"
 
 import { useAuth } from "~providers/AuthProvider"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
 import { FormErrorMessage } from "./FormsError"
 
 const emailManagementFormSchema = z.object({
@@ -33,10 +35,12 @@ const emailManagementFormSchema = z.object({
 
 type EmailManagementForm = z.infer<typeof emailManagementFormSchema>
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function EmailManagement() {
     const { userSession } = useAuth()
+    const { showErrorMessage, showSuccessMessage, hideErrorMessages } =
+        useAlert()
+    const navigate = useNavigate()
+
     const {
         register,
         control,
@@ -62,57 +66,40 @@ function EmailManagement() {
         getInvitations()
     }, [])
 
-    const onSubmit: SubmitHandler<EmailManagementForm> = async (data) =>
+    const onSubmit: SubmitHandler<EmailManagementForm> = async (data) => {
+        await hideErrorMessages()
         await saveEmails(data)
+    }
 
-    const saveEmails = async (emails: EmailManagementForm) =>
-        await fetch(
-            `${serverUri}/api/v1/organizations/${userSession.user.organization.id}/invitations`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: JSON.stringify(emails)
-            }
-        )
+    const saveEmails = async (emails: EmailManagementForm) => {
+        try {
+            await httpRequest.post(
+                `/v1/organizations/${userSession.user.organization.id}/invitations`,
+                emails
+            )
+            await showSuccessMessage("User email addresses saved with success.")
+            navigate("/menu")
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
+        }
+    }
 
-    const deleteEmail = async (email) =>
-        await fetch(
-            `${serverUri}/api/v1/organizations/${userSession.user.organization.id}/invitations`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                },
-                body: JSON.stringify(email)
+    const getInvitations = async () => {
+        try {
+            const response = await httpRequest.get(
+                `/v1/organizations/${userSession.user.organization.id}/invitations`
+            )
+            const emails = response.data as { email?: string }[]
+            if (emails.length > 0) {
+                setValue("emails", emails)
             }
-        )
-
-    const getInvitations = async () =>
-        await fetch(
-            `${serverUri}/api/v1/organizations/${userSession.user.organization.id}/invitations`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${userSession.token}`
-                }
-            }
-        )
-            .then((response) => response.json())
-            .then((emails) => {
-                if (emails.length > 0) {
-                    setValue("emails", emails)
-                }
-            })
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
+        }
+    }
 
     const removeEmail = async (item, index) => {
         remove(index)
-        console.dir(errors)
-        await deleteEmail({ email: item.email })
     }
 
     return (

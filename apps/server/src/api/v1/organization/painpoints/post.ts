@@ -3,6 +3,7 @@ import { parse } from "papaparse"
 import { z } from "zod"
 import { Painpoints } from "~/constants/painpoints"
 import { painpointRepository } from "~/repository/painpointRepository"
+import CustomError from "~/types/CustomError"
 import { generateEmbeddings } from "~/util/embeddings"
 
 async function PostPainpointsRequestHandler(
@@ -13,24 +14,36 @@ async function PostPainpointsRequestHandler(
     const organizationId = req.params.id
 
     if (!organizationId) {
-        res.status(404)
-        return next(new Error("Organization param not found"))
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Organization param not found"
+        } as CustomError)
     }
     if (!req.file) {
         res.status(400)
-        return next(new Error("No file uploaded"))
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "No file uploaded"
+        } as CustomError)
     }
 
     if (!(req.file.originalname.split(".").pop() === "csv")) {
         res.status(400)
-        return next(new Error("File has not the correct extension"))
+        return next({
+            code: "INVALID_EXTENSION",
+            message: "Invalid file extension"
+        } as CustomError)
     }
 
     const parsedFile = parse(req.file.buffer.toString(), { header: true })
 
     if (!parsedFile.data) {
         res.status(400)
-        return next(new Error("File is empty"))
+        return next({
+            code: "EMPTY_FILE",
+            message: "File is empty"
+        } as CustomError)
     }
 
     if (
@@ -38,7 +51,11 @@ async function PostPainpointsRequestHandler(
         !(parsedFile.meta.fields?.[1] === "answer")
     ) {
         res.status(400)
-        return next(new Error("File is not in the correct format"))
+        return next({
+            code: "INCORRECT_TEMPLATE",
+            message:
+                "Incorrect template: column headers 'painpoint' and 'answer' not found"
+        } as CustomError)
     }
 
     const painpointSchema = z.object({
@@ -65,7 +82,10 @@ async function PostPainpointsRequestHandler(
     if (!verify.success) {
         console.error(verify.error)
         res.status(400)
-        return next(new Error("File is not formatted correctly"))
+        return next({
+            code: "INVALID_FORMAT",
+            message: "File is not formatted correctly"
+        } as CustomError)
     }
 
     const embeddings = await generateEmbeddings(data, organizationId)
@@ -73,10 +93,9 @@ async function PostPainpointsRequestHandler(
     try {
         await painpointRepository.deleteByOrganizationId(organizationId)
         await painpointRepository.create(embeddings)
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
         res.status(500)
-        return next(err)
+        return next(error)
     }
 
     return res.sendStatus(201)

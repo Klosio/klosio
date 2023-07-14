@@ -8,6 +8,9 @@ import { useAuth } from "~providers/AuthProvider"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
+import type { ErrorCode } from "~types/errorCode.model"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 
 const signUpFormSchema = z.object({
@@ -23,7 +26,7 @@ type SignUpForm = z.infer<typeof signUpFormSchema>
 interface SignUpResponse {
     ok: boolean
     userSession?: UserSession
-    message?: string
+    errorCode?: ErrorCode
 }
 
 interface UserDto {
@@ -31,10 +34,10 @@ interface UserDto {
     authId: string
 }
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function SignUp() {
     const { login } = useAuth()
+    const { showErrorMessage, showSuccessMessage, hideErrorMessages } =
+        useAlert()
 
     const {
         register,
@@ -46,15 +49,18 @@ function SignUp() {
         resolver: zodResolver(signUpFormSchema)
     })
 
-    const onSubmit: SubmitHandler<SignUpForm> = async (data: SignUpForm) =>
+    const onSubmit: SubmitHandler<SignUpForm> = async (data: SignUpForm) => {
         await submit(data)
+    }
 
     const submit = async (form: SignUpForm) => {
+        await hideErrorMessages()
         const response = await handleSignUp(form.email, form.password)
         if (!response.ok) {
-            alert(response.message)
+            await showErrorMessage(response.errorCode)
             return
         }
+        await showSuccessMessage("Account created with success.")
         await login(response.userSession)
     }
 
@@ -69,8 +75,12 @@ function SignUp() {
             } = await supabase.auth.signUp({ email: username, password })
 
             if (error) {
-                console.error(`Error with auth: ${error.message}`)
-                return { ok: false, message: error.message }
+                switch (error.message) {
+                    case "User already registered":
+                        return { ok: false, errorCode: "EXISTING_EMAIL" }
+                    default:
+                        return { ok: false, errorCode: "UNKNOWN" }
+                }
             }
 
             return {
@@ -81,8 +91,7 @@ function SignUp() {
                 }
             }
         } catch (error) {
-            console.error(error)
-            return { ok: false, message: "An error occured, please try again." }
+            return { ok: false, errorCode: "UNKNOWN" }
         }
     }
 
@@ -94,19 +103,12 @@ function SignUp() {
             email: username,
             authId: userSession.authId
         }
-        const response = await fetch(`${serverUri}/api/v1/users`, {
-            method: "POST",
+        const response = await httpRequest.post(`/v1/users`, userToCreate, {
             headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${userSession.token}`
-            },
-            body: JSON.stringify(userToCreate)
+            }
         })
-        if (!response.ok) {
-            console.error("Error when saving user")
-            return
-        }
-        return (await response.json()) as User
+        return response.data as User
     }
 
     const handleSignUp = async (
@@ -117,13 +119,17 @@ function SignUp() {
         if (!response.ok) {
             return response
         }
-        const createdUser = await createUser(username, response.userSession)
-        if (!createdUser) {
-            return { ok: false, message: "An error occured, please try again." }
-        }
-        return {
-            ok: true,
-            userSession: { ...response.userSession, user: createdUser }
+        try {
+            const createdUser = await createUser(username, response.userSession)
+            return {
+                ok: true,
+                userSession: { ...response.userSession, user: createdUser }
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                errorCode: error.response.data.code
+            }
         }
     }
 
@@ -175,11 +181,6 @@ function SignUp() {
                                     className="block text-sm mb-2 dark:text-white">
                                     Password
                                 </label>
-                                <a
-                                    className="text-sm text-klosio-blue-600 decoration-2 hover:underline font-medium"
-                                    href="../examples/html/recover-account.html">
-                                    Forgot password?
-                                </a>
                             </div>
                             <div className="relative">
                                 <input

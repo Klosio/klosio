@@ -10,12 +10,12 @@ import "~/style.css"
 import AppHeader from "~components/AppHeader"
 import Options from "~components/Options"
 import OptionsUnauthorized from "~components/OptionsUnauthorized"
+import { httpRequest } from "~core/httpRequest"
+import { AlertProvider } from "~providers/AlertProvider"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
 
 import("preline")
-
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
 function IndexOptions() {
     const [userSession, setUserSession] = useStorage<UserSession>({
@@ -32,12 +32,13 @@ function IndexOptions() {
                 await setUserSession(null)
                 return
             }
-            const user = await fetchUser(session)
-            if (!user) {
-                await setUserSession(null)
-                return
+            try {
+                const user = await fetchUser(session)
+                session.user = user
+            } catch (error) {
+                //console.error(error)
             }
-            await setUserSession({ ...session, user: user })
+            await setUserSession(session)
         }
     }
 
@@ -56,20 +57,15 @@ function IndexOptions() {
     }
 
     const fetchUser = async (session: UserSession): Promise<User> => {
-        const response = await fetch(
-            `${serverUri}/api/v1/users/auth-id/${session.authId}`,
+        const response = await httpRequest.get(
+            `/v1/users/auth-id/${session.authId}`,
             {
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${session.token}`
                 }
             }
         )
-        if (!response.ok) {
-            console.error("Error on user get")
-            return
-        }
-        return (await response.json()) as User
+        return response.data as User
     }
 
     useEffect(() => {
@@ -77,13 +73,18 @@ function IndexOptions() {
     }, [])
 
     return (
-        <div className="m-2 flex flex-col w-full text-center">
-            <AppHeader />
-            {userSession && userSession?.user?.role_id === "KLOSIO_ADMIN" ? (
-                <Options userSession={userSession} />
-            ) : (
-                <OptionsUnauthorized />
-            )}
+        <div className="m-2 flex flex-col w-full items-center justify-center text-center">
+            <div className="w-[700px]">
+                <AppHeader />
+                <AlertProvider>
+                    {userSession &&
+                    userSession?.user?.role_id === "KLOSIO_ADMIN" ? (
+                        <Options userSession={userSession} />
+                    ) : (
+                        <OptionsUnauthorized />
+                    )}
+                </AlertProvider>
+            </div>
         </div>
     )
 }

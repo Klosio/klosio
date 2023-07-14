@@ -6,6 +6,8 @@ import { z } from "zod"
 import { useAuth } from "~providers/AuthProvider"
 import type Organization from "~types/organization.model"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 import Info from "./Info"
 
@@ -15,10 +17,10 @@ const organizationCreationFormSchema = z.object({
 
 type OrganizationCreationForm = z.infer<typeof organizationCreationFormSchema>
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function OrganizationCreation() {
     const { userSession, updateSession } = useAuth()
+    const { showErrorMessage, showSuccessMessage, hideErrorMessages } =
+        useAlert()
     const navigate = useNavigate()
 
     const {
@@ -33,38 +35,33 @@ function OrganizationCreation() {
 
     const onSubmit: SubmitHandler<OrganizationCreationForm> = async (
         data: OrganizationCreationForm
-    ) => await submitOrganizationCreation(data)
+    ) => {
+        await hideErrorMessages()
+        await submitOrganizationCreation(data)
+    }
 
     const submitOrganizationCreation = async (
         form: OrganizationCreationForm
     ) => {
-        const organization = await createOrganization(form)
-        if (!organization) {
-            alert("An error occured, please try again.")
-            return
+        try {
+            const organization = await createOrganization(form)
+            await showSuccessMessage("Organization created with success.")
+            userSession.user.organization = organization
+            await updateSession(userSession)
+            navigate("/menu")
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
         }
-        alert("Organization created with success")
-        userSession.user.organization = organization
-        await updateSession(userSession)
-        navigate("/menu")
     }
 
     const createOrganization = async (
         form: OrganizationCreationForm
     ): Promise<Organization> => {
-        const response = await fetch(`${serverUri}/api/v1/organizations/`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${userSession.token}`
-            },
-            body: JSON.stringify({ ...form, user: userSession.user })
+        const response = await httpRequest.post("/v1/organizations/", {
+            ...form,
+            user: userSession.user
         })
-        if (!response.ok) {
-            console.error("Error when saving organization")
-            return
-        }
-        return (await response.json()) as Organization
+        return response.data as Organization
     }
 
     return (

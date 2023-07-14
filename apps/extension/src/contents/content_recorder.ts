@@ -1,8 +1,7 @@
 import RecordRTC from "recordrtc"
+import { httpRequest } from "~core/httpRequest"
 import type BattlecardResponse from "~types/battlecard.model"
 import type UserSession from "~types/userSession.model"
-
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
 
 async function startRecording(
     language: string,
@@ -99,16 +98,17 @@ async function getBattlecardAnalysis(
 ): Promise<BattlecardResponse> {
     const formData = new FormData()
     formData.append("file", file)
-    const battlecard: BattlecardResponse = await fetch(
-        `${serverUri}/api/v1/analysis/${language}/${userSession.user.organization.id}`,
-        {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${userSession.token}`
-            },
-            body: formData
-        }
-    ).then((response) => response.json())
+    const battlecard: BattlecardResponse = await httpRequest
+        .post(
+            `/v1/analysis/${language}/${userSession.user.organization.id}`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }
+        )
+        .then((response) => response.data)
     return battlecard
 }
 

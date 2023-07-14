@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import invitationsRepository from "~/repository/invitationRepository"
 import { organizationRepository } from "~/repository/organizationRepository"
 import { userRepository } from "~/repository/userRepository"
+import CustomError from "~/types/CustomError"
 import User from "~/types/User"
 
 async function PostUserRequestHandler(
@@ -13,7 +14,10 @@ async function PostUserRequestHandler(
 
     if (!email || !authId) {
         res.status(400)
-        return next(new Error("No email or authId specified in body params"))
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "No email or authId specified in body params"
+        } as CustomError)
     }
 
     const user: Omit<User, "id"> = {
@@ -21,41 +25,51 @@ async function PostUserRequestHandler(
         auth_id: authId
     }
 
-    const domain = email.match(new RegExp(/.*@(\S+)/))[1]
-
     try {
-        let createdUser = await userRepository.create({
+        const exists = await userRepository.existsByEmail(email)
+        if (exists) {
+            res.status(400)
+            return next({
+                code: "EXISTING_EMAIL",
+                message: "Email already exists"
+            } as CustomError)
+        }
+
+        const emailInvitation = await invitationsRepository.getByEmail(
+            email,
+            false
+        )
+
+        if (emailInvitation) {
+            const createdUser = await userRepository.create({
+                ...user,
+                role_id: "ORG_MEMBER",
+                organization: emailInvitation.organization
+            })
+            await invitationsRepository.disable(emailInvitation.id)
+            return res.status(201).json(createdUser)
+        }
+
+        const domain = email.match(new RegExp(/.*@(\S+)/))[1]
+        const organization = await organizationRepository.findByDomain(domain)
+        if (organization) {
+            const createdUser = await userRepository.create({
+                ...user,
+                role_id: "ORG_MEMBER",
+                organization: organization
+            })
+            return res.status(201).json(createdUser)
+        }
+
+        const createdUser = await userRepository.create({
             ...user,
             role_id: "ORG_ADMIN"
         })
 
-        const organizationDomain = await organizationRepository.findByDomain(
-            domain
-        )
-
-        if (!!organizationDomain) {
-            createdUser = await userRepository.update({
-                ...createdUser,
-                role_id: "ORG_MEMBER",
-                organization: { id: organizationDomain.id }
-            })
-        }
-
-        const emailInvitation = await invitationsRepository.getByEmail(email)
-
-        if (!!emailInvitation) {
-            createdUser = await userRepository.update({
-                ...createdUser,
-                role_id: "ORG_MEMBER",
-                organization: { id: emailInvitation.organization_id }
-            })
-            await invitationsRepository.disable(emailInvitation.id)
-        }
-
         return res.status(201).json(createdUser)
-    } catch (err) {
-        console.error(err)
-        return next(err)
+    } catch (error) {
+        res.status(500)
+        return next(error)
     }
 }
 

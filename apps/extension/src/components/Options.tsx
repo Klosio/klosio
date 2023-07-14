@@ -12,6 +12,8 @@ import "~/style.css"
 import { FormErrorMessage } from "./FormsError"
 
 import { MATCH_THRESHOLD, PROMPT } from "~constants/options"
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
 import { optionsFormSchema } from "~validation/optionsForm.schema"
 
 import("preline")
@@ -25,9 +27,9 @@ interface OptionsProps {
 
 type OptionsForm = z.infer<typeof optionsFormSchema>
 
-const serverUri = process.env.PLASMO_PUBLIC_SERVER_URL
-
 function Options(props: OptionsProps) {
+    const { showErrorMessage, showSuccessMessage } = useAlert()
+
     const {
         register,
         handleSubmit,
@@ -42,21 +44,13 @@ function Options(props: OptionsProps) {
     const onSubmit = async (data: OptionsForm) => await saveOptions(data)
 
     const fetchCurrentValue = async (optionName: AvailableOption) => {
-        const response = await fetch(
-            `${serverUri}/api/v1/options/${optionName}`,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${props.userSession.token}`
-                }
-            }
-        )
-        if (!response.ok) {
-            console.error(`Error on ${optionName} get`)
-            return
+        try {
+            const response = await httpRequest.get(`/v1/options/${optionName}`)
+            const option = response.data as Option
+            setValue(optionName, option.value)
+        } catch (error) {
+            await showErrorMessage(error.response.data.code)
         }
-        const option: Option = await response.json()
-        setValue(optionName, option.value)
     }
 
     const saveOptions = async (form: OptionsForm) => {
@@ -64,37 +58,21 @@ function Options(props: OptionsProps) {
             saveOptionValue(option, form[option])
         )
         try {
-            const responses = await Promise.all(savedOptionPromises)
-            if (responses && responses.some((response) => !response.ok)) {
-                console.error("Error on options save")
-                return
-            }
+            await Promise.all(savedOptionPromises)
         } catch (error) {
-            console.error(error)
+            await showErrorMessage(error.response.data.code)
             return
         }
-        alert("Options saved with success")
+        await showSuccessMessage("Options saved with success.")
     }
 
     const saveOptionValue = async (
         optionName: AvailableOption,
         value: string
     ) => {
-        const response = await fetch(
-            `${serverUri}/api/v1/options/${optionName}`,
-            {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${props.userSession.token}`
-                },
-                body: JSON.stringify({ value: value })
-            }
-        )
-        if (!response.ok) {
-            console.error(`Error on ${optionName} save`)
-            return response
-        }
+        const response = await httpRequest.put(`/v1/options/${optionName}`, {
+            value: value
+        })
         setValue(optionName, value)
         return response
     }

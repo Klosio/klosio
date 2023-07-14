@@ -1,5 +1,5 @@
 export default interface Organization {
     id: string
-    name?: string
+    name: string
     domain?: string
 }

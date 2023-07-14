@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { z } from "zod"
 import { organizationRepository } from "~/repository/organizationRepository"
+import CustomError from "~/types/CustomError"
 
 const emailManagementFormSchema = z.object({
     domain: z
@@ -24,25 +25,32 @@ async function PostDomainRequestHandler(
     const { id } = req.params
 
     if (!id) {
-        res.status(400).json({ message: "Id is required" })
-        return
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Id param not found"
+        } as CustomError)
     }
 
     const { domain } = req.body as EmailManagementForm
 
     if (!domain) {
-        res.status(400).json({ message: "Domain is required" })
-        return
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Domain is required"
+        } as CustomError)
     }
 
     const test = emailManagementFormSchema.safeParse({ domain })
 
     if (!test.success) {
-        res.status(400).json({ message: test.error.message })
-        return
+        console.error(test.error.message)
+        return next({
+            code: "INVALID_FORMAT",
+            message: "Invalid format."
+        } as CustomError)
     }
-
-    console.log(test)
 
     try {
         const organization = await organizationRepository.find(id)

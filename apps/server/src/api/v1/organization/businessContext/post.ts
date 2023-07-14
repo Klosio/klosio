@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { businessContextRepository } from "~/repository/businessContextRepository"
 import BusinessContext from "~/types/BusinessContext"
+import CustomError from "~/types/CustomError"
 import { businessContextSchema } from "~/validation/businessContext.schema"
 
 async function PostBusinessContextRequestHandler(
@@ -11,8 +12,11 @@ async function PostBusinessContextRequestHandler(
     const organizationId = req.params.id
 
     if (!organizationId) {
-        res.status(404)
-        return next(new Error("Organization param not found"))
+        res.status(400)
+        return next({
+            code: "MISSING_PARAMETER",
+            message: "Organization param not found"
+        } as CustomError)
     }
 
     const businessContext: Omit<BusinessContext, "id"> = {
@@ -25,7 +29,10 @@ async function PostBusinessContextRequestHandler(
     if (!verify.success) {
         console.error(verify.error)
         res.status(400)
-        return next(new Error("Data is not correctly formatted"))
+        return next({
+            code: "INVALID_FORMAT",
+            message: "Data is not correctly formatted"
+        } as CustomError)
     }
 
     try {
@@ -33,10 +40,9 @@ async function PostBusinessContextRequestHandler(
             businessContext
         )
         return res.status(201).json(createdBusinessContext)
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
         res.status(500)
-        return next(err)
+        return next(error)
     }
 }
 
