@@ -21,7 +21,7 @@ jobs:
                   MONGO_DB_URI: ${{ secrets.MONGO_DB_URI }}
 
     extension:
-        name: Build and package Klosio extension on Github Artifacts
+        name: Build, package and deploy Klosio extension to the Chrome Web Store
         runs-on: ubuntu-latest
         steps:
             - name: Checkout Repository
@@ -50,3 +50,8 @@ jobs:
               with:
                   name: chrome-mv3-prod
                   path: apps/extension/build/chrome-mv3-prod.zip
+            - name: Browser Platform Publish
+              uses: PlasmoHQ/bpp@v3
+              with:
+                  keys: ${{ secrets.SUBMIT_KEYS }}
+                  artifact: apps/extension/build/chrome-mv3-prod.zip
