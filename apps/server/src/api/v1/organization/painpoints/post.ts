@@ -47,8 +47,10 @@ async function PostPainpointsRequestHandler(
     }
 
     if (
-        !(parsedFile.meta.fields?.[0] === "painpoint") &&
-        !(parsedFile.meta.fields?.[1] === "answer")
+        !parsedFile.meta.fields ||
+        parsedFile.meta.fields.length !== 2 ||
+        parsedFile.meta.fields[0] !== "painpoint" ||
+        parsedFile.meta.fields[1] !== "answer"
     ) {
         res.status(400)
         return next({

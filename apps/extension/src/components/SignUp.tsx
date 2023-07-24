@@ -18,7 +18,10 @@ const signUpFormSchema = z.object({
         .string()
         .email({ message: "The email is invalid" })
         .nonempty({ message: "The email is required" }),
-    password: z.string().nonempty({ message: "The password is required" })
+    password: z
+        .string()
+        .min(12, { message: "The password must be at least 12 characters" })
+        .nonempty({ message: "The password is required" })
 })
 
 type SignUpForm = z.infer<typeof signUpFormSchema>
