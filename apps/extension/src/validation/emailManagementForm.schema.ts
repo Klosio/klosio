@@ -1,15 +1,24 @@
 import { z } from "zod"
 
 const emailManagementFormSchema = z.object({
-    domain: z
-        .string()
-        .regex(
-            new RegExp(
-                /^(?!-)[A-Za-z0-9-]+([\-\.]{1}[a-z0-9]+)*\.[A-Za-z]{2,6}$/
-            ),
-            "The domain is invalid"
+    emails: z
+        .array(
+            z.object({
+                email: z
+                    .string()
+                    .nonempty({ message: "Email is required" })
+                    .email({ message: "Email is invalid" })
+            })
         )
-        .nonempty("The domain is required")
+        .refine(
+            (items) => {
+                const emails = items.map((item) => item.email)
+                return new Set(emails).size === emails.length
+            },
+            {
+                message: "Duplicate email"
+            }
+        )
 })
 
 export { emailManagementFormSchema }

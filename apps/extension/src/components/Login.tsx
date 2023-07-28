@@ -11,6 +11,7 @@ import type UserSession from "~types/userSession.model"
 import { httpRequest } from "~core/httpRequest"
 import { useAlert } from "~providers/AlertProvider"
 import type { ErrorCode } from "~types/errorCode.model"
+import { loginFormSchema } from "~validation/loginForm.schema"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 
 interface EmailLoginResponse {
@@ -18,15 +19,6 @@ interface EmailLoginResponse {
     userSession?: UserSession
     errorCode?: ErrorCode
 }
-
-const loginFormSchema = z.object({
-    email: z
-        .string()
-        .email({ message: "The email is invalid" })
-        .nonempty({ message: "The email is required" }),
-    password: z.string().nonempty({ message: "The password is required" }),
-    remember: z.boolean().optional()
-})
 
 type LoginForm = z.infer<typeof loginFormSchema>
 
@@ -39,8 +31,8 @@ function Login() {
         handleSubmit,
         formState: { isValid, isSubmitting, errors }
     } = useForm<LoginForm>({
-        mode: "onBlur",
-        reValidateMode: "onBlur",
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(loginFormSchema)
     })
 
@@ -150,81 +142,81 @@ function Login() {
                         </Link>
                     </p>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="grid gap-y-4">
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm mb-2 dark:text-white">
-                                Email address
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    id="email"
-                                    {...register("email", {
-                                        required: true
-                                    })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500"
-                                />
-                                <FormErrorIcon error={errors?.email} />
-                            </div>
-                            <FormErrorMessage error={errors?.email} />
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="grid gap-y-4">
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block text-sm mb-2 dark:text-white">
+                            Email address
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="email"
+                                id="email"
+                                {...register("email", {
+                                    required: true
+                                })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500"
+                            />
+                            <FormErrorIcon error={errors?.email} />
                         </div>
-                        <div>
-                            <div className="flex justify-between items-center">
-                                <label
-                                    htmlFor="password"
-                                    className="block text-sm mb-2 dark:text-white">
-                                    Password
-                                </label>
-                                <a
-                                    className="text-sm text-klosio-blue-600 decoration-2 hover:underline font-medium"
-                                    href="../examples/html/recover-account.html">
-                                    Forgot password?
-                                </a>
-                            </div>
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    {...register("password", {
-                                        required: true
-                                    })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500"
-                                />
-                                <FormErrorIcon error={errors?.password} />
-                            </div>
-                            <FormErrorMessage error={errors?.password} />
-                        </div>
-                        <div className="flex items-center">
-                            <div className="flex">
-                                <input
-                                    id="remember"
-                                    name="remember"
-                                    type="checkbox"
-                                    {...register("remember", {
-                                        required: false
-                                    })}
-                                    className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-500"
-                                />
-                            </div>
-                            <div className="ml-3">
-                                <label
-                                    htmlFor="remember"
-                                    className="text-sm dark:text-white">
-                                    Remember me
-                                </label>
-                            </div>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={!isValid || isSubmitting}
-                            className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold disabled:bg-klosio-blue-300 bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm">
-                            Sign in
-                        </button>
+                        <FormErrorMessage error={errors?.email} />
                     </div>
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <label
+                                htmlFor="password"
+                                className="block text-sm mb-2 dark:text-white">
+                                Password
+                            </label>
+                            <a
+                                className="text-sm text-klosio-blue-600 decoration-2 hover:underline font-medium"
+                                href="../examples/html/recover-account.html">
+                                Forgot password?
+                            </a>
+                        </div>
+                        <div className="relative">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                {...register("password", {
+                                    required: true
+                                })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500"
+                            />
+                            <FormErrorIcon error={errors?.password} />
+                        </div>
+                        <FormErrorMessage error={errors?.password} />
+                    </div>
+                    <div className="flex items-center">
+                        <div className="flex">
+                            <input
+                                id="remember"
+                                name="remember"
+                                type="checkbox"
+                                {...register("remember", {
+                                    required: false
+                                })}
+                                className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-500"
+                            />
+                        </div>
+                        <div className="ml-3">
+                            <label
+                                htmlFor="remember"
+                                className="text-sm dark:text-white">
+                                Remember me
+                            </label>
+                        </div>
+                    </div>
+                    <button
+                        type="submit"
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                        disabled={!isValid || isSubmitting}>
+                        Sign in
+                    </button>
                 </form>
             </div>
         </>

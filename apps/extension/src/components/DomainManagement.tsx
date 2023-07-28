@@ -9,10 +9,11 @@ import type Organization from "~types/organization.model"
 
 import { httpRequest } from "~core/httpRequest"
 import { useAlert } from "~providers/AlertProvider"
-import { emailManagementFormSchema } from "~validation/emailManagementForm.schema"
+import { domainManagementFormSchema } from "~validation/domainManagementForm.schema"
+import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 import Info from "./Info"
 
-type EmailManagementForm = z.infer<typeof emailManagementFormSchema>
+type DomainManagementForm = z.infer<typeof domainManagementFormSchema>
 
 function DomainManagement() {
     const { userSession } = useAuth()
@@ -24,9 +25,11 @@ function DomainManagement() {
         register,
         handleSubmit,
         setValue,
-        formState: { isValid, isSubmitting }
-    } = useForm<EmailManagementForm>({
-        resolver: zodResolver(emailManagementFormSchema)
+        formState: { isValid, isSubmitting, errors }
+    } = useForm<DomainManagementForm>({
+        mode: "onChange",
+        reValidateMode: "onChange",
+        resolver: zodResolver(domainManagementFormSchema)
     })
 
     useEffect(() => {
@@ -48,7 +51,7 @@ function DomainManagement() {
         }
     }
 
-    const onSubmit: SubmitHandler<EmailManagementForm> = async (data) => {
+    const onSubmit: SubmitHandler<DomainManagementForm> = async (data) => {
         await hideErrorMessages()
         try {
             const response = await saveDomain(
@@ -86,22 +89,24 @@ function DomainManagement() {
                 className="font-bold text-klosio-green-300 hover:text-klosio-green-600 focus:outline-none focus:ring-2 ring-offset-white focus:ring-klosio-green-300 focus:ring-offset-2 transition-all text-sm">
                 Switch to manual management
             </Link>
-            <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex flex-col items-center justify-center w-full space-y-3">
-                <div className="w-full">
+            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-y-4">
+                <div>
                     <label
                         htmlFor="domain"
                         className="block text-sm font-medium mb-2 dark:text-white">
                         Organization custom email domain
                     </label>
-                    <input
-                        type="text"
-                        id="domain"
-                        {...register("domain", { required: true })}
-                        className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
-                        placeholder="mydomain.com"
-                    />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            id="domain"
+                            {...register("domain", { required: true })}
+                            className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
+                            placeholder="mydomain.com"
+                        />
+                        <FormErrorIcon error={errors?.domain} />
+                    </div>
+                    <FormErrorMessage error={errors?.domain} />
                 </div>
                 <Info>
                     All users signing-in with an email address from your domain
@@ -109,8 +114,8 @@ function DomainManagement() {
                 </Info>
                 <button
                     type="submit"
-                    disabled={!isValid || isSubmitting}
-                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                    disabled={!isValid || isSubmitting}>
                     Save
                 </button>
             </form>
