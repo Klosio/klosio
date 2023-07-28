@@ -1,7 +1,7 @@
 {
   "name": "extension",
   "displayName": "Klosio - Battlecards AI",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Chrome extension that aims to assist salespersons in improving their sales skills",
   "author": "Klosio",
   "packageManager": "npm@9.5.1",

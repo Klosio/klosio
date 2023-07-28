@@ -79,7 +79,11 @@ async function PostPainpointsRequestHandler(
 
     const data = parsedFile.data as z.infer<typeof painpointSchema>[]
 
-    const verify = z.array(painpointSchema).min(1).max(100).safeParse(data)
+    const verify = z
+        .array(painpointSchema)
+        .min(1)
+        .max(Painpoints.MAX_PAINPOINTS)
+        .safeParse(data)
 
     if (!verify.success) {
         console.error(verify.error)

@@ -191,26 +191,6 @@ function Login() {
                         </div>
                         <FormErrorMessage error={errors?.password} />
                     </div>
-                    <div className="flex items-center">
-                        <div className="flex">
-                            <input
-                                id="remember"
-                                name="remember"
-                                type="checkbox"
-                                {...register("remember", {
-                                    required: false
-                                })}
-                                className="shrink-0 mt-0.5 border-gray-200 rounded text-klosio-blue-600 pointer-events-none focus:ring-klosio-blue-500"
-                            />
-                        </div>
-                        <div className="ml-3">
-                            <label
-                                htmlFor="remember"
-                                className="text-sm dark:text-white">
-                                Remember me
-                            </label>
-                        </div>
-                    </div>
                     <button
                         type="submit"
                         className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
