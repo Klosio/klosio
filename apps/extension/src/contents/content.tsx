@@ -67,6 +67,7 @@ const PopupButton = () => {
                 }
                 setUserSession(userSession)
                 setLanguage(language)
+                resetBattlecards()
                 const recording = await startRecording(
                     language,
                     userSession,
@@ -86,6 +87,10 @@ const PopupButton = () => {
             }
         }
         return onMessage
+    }
+
+    const resetBattlecards = () => {
+        setBattlecards([])
     }
 
     const updateBattlecards = (battlecard: BattlecardResponse) => {
