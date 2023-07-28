@@ -8,12 +8,9 @@ import type Organization from "~types/organization.model"
 
 import { httpRequest } from "~core/httpRequest"
 import { useAlert } from "~providers/AlertProvider"
+import { organizationCreationFormSchema } from "~validation/organizationCreationForm.schema"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 import Info from "./Info"
-
-const organizationCreationFormSchema = z.object({
-    name: z.string().nonempty({ message: "The name is required" })
-})
 
 type OrganizationCreationForm = z.infer<typeof organizationCreationFormSchema>
 
@@ -28,8 +25,8 @@ function OrganizationCreation() {
         handleSubmit,
         formState: { isValid, isSubmitting, errors }
     } = useForm<OrganizationCreationForm>({
-        mode: "onBlur",
-        reValidateMode: "onBlur",
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(organizationCreationFormSchema)
     })
 
@@ -75,39 +72,39 @@ function OrganizationCreation() {
                         You will be the only administrator of this organization
                     </p>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="grid gap-y-4 mt-2">
-                        <div>
-                            <label
-                                htmlFor="name"
-                                className="block text-sm mb-2 dark:text-white">
-                                Organization name
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                    {...register("name", {
-                                        required: true
-                                    })}
-                                />
-                                <FormErrorIcon error={errors?.name} />
-                            </div>
-                            <FormErrorMessage error={errors?.name} />
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="grid gap-y-4 mt-2">
+                    <div>
+                        <label
+                            htmlFor="name"
+                            className="block text-sm mb-2 dark:text-white">
+                            Organization name
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                {...register("name", {
+                                    required: true
+                                })}
+                            />
+                            <FormErrorIcon error={errors?.name} />
                         </div>
-                        <Info>
-                            Only you will be able to provide the business
-                            context and manage the organization users.
-                        </Info>
-                        <button
-                            type="submit"
-                            disabled={!isValid || isSubmitting}
-                            className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                            Create
-                        </button>
+                        <FormErrorMessage error={errors?.name} />
                     </div>
+                    <Info>
+                        Only you will be able to provide the business context
+                        and manage the organization users.
+                    </Info>
+                    <button
+                        type="submit"
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                        disabled={!isValid || isSubmitting}>
+                        Create
+                    </button>
                 </form>
             </div>
         </>

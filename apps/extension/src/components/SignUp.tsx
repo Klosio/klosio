@@ -11,18 +11,8 @@ import type UserSession from "~types/userSession.model"
 import { httpRequest } from "~core/httpRequest"
 import { useAlert } from "~providers/AlertProvider"
 import type { ErrorCode } from "~types/errorCode.model"
+import { signUpFormSchema } from "~validation/signUpForm.schema"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
-
-const signUpFormSchema = z.object({
-    email: z
-        .string()
-        .email({ message: "The email is invalid" })
-        .nonempty({ message: "The email is required" }),
-    password: z
-        .string()
-        .min(12, { message: "The password must be at least 12 characters" })
-        .nonempty({ message: "The password is required" })
-})
 
 type SignUpForm = z.infer<typeof signUpFormSchema>
 
@@ -47,8 +37,8 @@ function SignUp() {
         handleSubmit,
         formState: { isValid, isSubmitting, errors }
     } = useForm<SignUpForm>({
-        mode: "onBlur",
-        reValidateMode: "onBlur",
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(signUpFormSchema)
     })
 
@@ -159,55 +149,55 @@ function SignUp() {
                         </p>
                     </div>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="grid gap-y-4">
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm mb-2 dark:text-white">
-                                Email address
-                            </label>
-                            <div className="relative">
-                                <input
-                                    type="email"
-                                    id="email"
-                                    {...register("email", {
-                                        required: true
-                                    })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                />
-                                <FormErrorIcon error={errors?.email} />
-                            </div>
-                            <FormErrorMessage error={errors?.email} />
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="grid gap-y-4">
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block text-sm mb-2 dark:text-white">
+                            Email address
+                        </label>
+                        <div className="relative">
+                            <input
+                                type="email"
+                                id="email"
+                                {...register("email", {
+                                    required: true
+                                })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                            />
+                            <FormErrorIcon error={errors?.email} />
                         </div>
-                        <div>
-                            <div className="flex justify-between items-center">
-                                <label
-                                    htmlFor="password"
-                                    className="block text-sm mb-2 dark:text-white">
-                                    Password
-                                </label>
-                            </div>
-                            <div className="relative">
-                                <input
-                                    type="password"
-                                    id="password"
-                                    {...register("password", {
-                                        required: true
-                                    })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                />
-                                <FormErrorIcon error={errors?.password} />
-                            </div>
-                            <FormErrorMessage error={errors?.password} />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={!isValid || isSubmitting}
-                            className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                            Sign up
-                        </button>
+                        <FormErrorMessage error={errors?.email} />
                     </div>
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <label
+                                htmlFor="password"
+                                className="block text-sm mb-2 dark:text-white">
+                                Password
+                            </label>
+                        </div>
+                        <div className="relative">
+                            <input
+                                type="password"
+                                id="password"
+                                {...register("password", {
+                                    required: true
+                                })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                            />
+                            <FormErrorIcon error={errors?.password} />
+                        </div>
+                        <FormErrorMessage error={errors?.password} />
+                    </div>
+                    <button
+                        type="submit"
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                        disabled={!isValid || isSubmitting}>
+                        Sign up
+                    </button>
                 </form>
             </div>
         </>

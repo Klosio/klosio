@@ -36,8 +36,8 @@ function Options(props: OptionsProps) {
         setValue,
         formState: { isValid, isSubmitting, errors }
     } = useForm<OptionsForm>({
-        mode: "onBlur",
-        reValidateMode: "onBlur",
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(optionsFormSchema)
     })
 
@@ -89,51 +89,51 @@ function Options(props: OptionsProps) {
                     Provide options
                 </h1>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="flex flex-col space-y-5 items-center w-full">
-                    <div className="w-1/2">
-                        <label
-                            htmlFor={PROMPT}
-                            className="block text-sm mb-2 dark:text-white">
-                            Prompt
-                        </label>
-                        <div className="relative w-full">
-                            <textarea
-                                name={PROMPT}
-                                {...register(PROMPT, {
-                                    required: true
-                                })}
-                                className="block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                required
-                            />
-                        </div>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="flex flex-col space-y-5 items-center w-full">
+                <div className="w-1/2">
+                    <label
+                        htmlFor={PROMPT}
+                        className="block text-sm mb-2 dark:text-white">
+                        Prompt
+                    </label>
+                    <div className="relative w-full">
+                        <textarea
+                            name={PROMPT}
+                            {...register(PROMPT, {
+                                required: true
+                            })}
+                            className="block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                            required
+                        />
                     </div>
-                    <div className="w-1/2">
-                        <label
-                            htmlFor={MATCH_THRESHOLD}
-                            className="block text-sm mb-2 dark:text-white">
-                            Match threshold
-                        </label>
-                        <div className="relative w-full">
-                            <input
-                                type="text"
-                                name={MATCH_THRESHOLD}
-                                {...register(MATCH_THRESHOLD, {
-                                    required: true
-                                })}
-                                className="block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                required
-                            />
-                        </div>
-                        <FormErrorMessage error={errors?.prompt} />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={!isValid || isSubmitting}
-                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
-                        Save options
-                    </button>
                 </div>
+                <div className="w-1/2">
+                    <label
+                        htmlFor={MATCH_THRESHOLD}
+                        className="block text-sm mb-2 dark:text-white">
+                        Match threshold
+                    </label>
+                    <div className="relative w-full">
+                        <input
+                            type="text"
+                            name={MATCH_THRESHOLD}
+                            {...register(MATCH_THRESHOLD, {
+                                required: true
+                            })}
+                            className="block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-500 focus:ring-klosio-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                            required
+                        />
+                    </div>
+                    <FormErrorMessage error={errors?.prompt} />
+                </div>
+                <button
+                    type="submit"
+                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                    disabled={!isValid || isSubmitting}>
+                    Save options
+                </button>
             </form>
         </>
     )

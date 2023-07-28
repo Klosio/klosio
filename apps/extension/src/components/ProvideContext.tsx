@@ -32,10 +32,10 @@ function ProvideContext() {
         register,
         handleSubmit,
         reset,
-        formState: { errors, isValid, isSubmitting }
+        formState: { isValid, isSubmitting, errors }
     } = useForm<BusinessContextForm>({
-        mode: "onBlur",
-        reValidateMode: "onBlur",
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(businessContextFormSchema),
         defaultValues: {
             ...businessContext
@@ -131,6 +131,10 @@ function ProvideContext() {
         fetchBusinessContext()
     }, [])
 
+    const battlecards = register("battlecards", {
+        required: true
+    })
+
     return (
         <>
             <div className="flex flex-col w-full">
@@ -143,120 +147,117 @@ function ProvideContext() {
                         accurate real-time battlecards
                     </p>
                 </div>
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="flex flex-col space-y-2 items-center">
-                        <div className="w-full">
-                            <label
-                                htmlFor="industry"
-                                className="block text-sm mb-2 dark:text-white">
-                                Your industry
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="industry"
-                                    type="text"
-                                    {...register("industry", {
-                                        required: true
-                                    })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                    placeholder="Software as a Service"
-                                />
-                                <FormErrorIcon error={errors?.industry} />
+                <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="flex flex-col space-y-2 items-center">
+                    <div className="w-full">
+                        <label
+                            htmlFor="industry"
+                            className="block text-sm mb-2 dark:text-white">
+                            Your industry
+                        </label>
+                        <div className="relative">
+                            <input
+                                id="industry"
+                                type="text"
+                                {...register("industry", {
+                                    required: true
+                                })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                placeholder="Software as a Service"
+                            />
+                            <FormErrorIcon error={errors?.industry} />
+                        </div>
+                        <FormErrorMessage error={errors?.industry} />
+                    </div>
+                    <div className="w-full">
+                        <label
+                            htmlFor="selling"
+                            className="block text-sm mb-2 dark:text-white">
+                            The product / service you are selling
+                        </label>
+                        <div className="relative">
+                            <input
+                                id="selling"
+                                type="text"
+                                {...register("selling", { required: true })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                placeholder="Management software"
+                            />
+                            <FormErrorIcon error={errors?.selling} />
+                        </div>
+                        <FormErrorMessage error={errors?.selling} />
+                    </div>
+                    <div className="w-full">
+                        <label
+                            htmlFor="target"
+                            className="block text-sm mb-2 dark:text-white">
+                            Your target audience
+                        </label>
+                        <div className="relative">
+                            <textarea
+                                id="target"
+                                {...register("target", { required: true })}
+                                className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
+                                placeholder="Companies in Healthcare, Manufacturing, Hospitality, Retail..."
+                            />
+                            <FormErrorIcon error={errors?.target} />
+                        </div>
+                        <FormErrorMessage error={errors?.target} />
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="battlecards"
+                            className="block text-sm mb-2 dark:text-white">
+                            Your battlecards
+                        </label>
+                        <div className="flex-col">
+                            <Warning>
+                                This will replace previously imported
+                                battlecards.
+                            </Warning>
+                            <Info>
+                                Import a list of pain points with the
+                                corresponding answer as a .csv file following
+                                the template below.
+                            </Info>
+                            <div className="m-2">
+                                <a
+                                    href={csvFileTemplate}
+                                    download
+                                    className="text-klosio-blue-600 decoration-2 hover:underline font-medium">
+                                    Download .csv template
+                                </a>
                             </div>
-                            <FormErrorMessage error={errors?.industry} />
                         </div>
                         <div className="w-full">
-                            <label
-                                htmlFor="selling"
-                                className="block text-sm mb-2 dark:text-white">
-                                The product / service you are selling
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="selling"
-                                    type="text"
-                                    {...register("selling", { required: true })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                    placeholder="Management software"
-                                />
-                                <FormErrorIcon error={errors?.selling} />
-                            </div>
-                            <FormErrorMessage error={errors?.selling} />
-                        </div>
-                        <div className="w-full">
-                            <label
-                                htmlFor="target"
-                                className="block text-sm mb-2 dark:text-white">
-                                Your target audience
-                            </label>
-                            <div className="relative">
-                                <textarea
-                                    id="target"
-                                    {...register("target", { required: true })}
-                                    className="py-3 px-4 block w-full border-gray-200 rounded-md text-sm focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400"
-                                    placeholder="Companies in Healthcare, Manufacturing, Hospitality, Retail..."
-                                />
-                                <FormErrorIcon error={errors?.target} />
-                            </div>
-                            <FormErrorMessage error={errors?.target} />
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="battlecards"
-                                className="block text-sm mb-2 dark:text-white">
+                            <label htmlFor="battlecards" className="sr-only">
                                 Your battlecards
                             </label>
-                            <div className="flex-col">
-                                <Warning>
-                                    This will replace previously imported
-                                    battlecards.
-                                </Warning>
-                                <Info>
-                                    Import a list of pain points with the
-                                    corresponding answer as a .csv file
-                                    following the template below.
-                                </Info>
-                                <div className="m-2">
-                                    <a
-                                        href={csvFileTemplate}
-                                        download
-                                        className="text-klosio-blue-600 decoration-2 hover:underline font-medium">
-                                        Download .csv template
-                                    </a>
-                                </div>
-                            </div>
-                            <div className="w-full">
-                                <label
-                                    htmlFor="battlecards"
-                                    className="sr-only">
-                                    Your battlecards
-                                </label>
-                                <input
-                                    id="battlecards"
-                                    type="file"
-                                    {...register("battlecards", {
-                                        required: true
-                                    })}
-                                    className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
-                                                file:bg-transparent file:border-0
-                                                file:bg-gray-100 file:mr-4
-                                                file:py-3 file:px-4
-                                                dark:file:bg-gray-700 dark:file:text-gray-400"
-                                    onChange={(event) => {
-                                        setCsvFile(event.target.files[0])
-                                    }}
-                                />
-                            </div>
-                            <FormErrorMessage error={errors?.battlecards} />
+                            <input
+                                id="battlecards"
+                                type="file"
+                                {...battlecards}
+                                className="block w-full border border-gray-200 shadow-sm rounded-md text-sm focus:z-10 focus:border-klosio-blue-300 focus:ring-klosio-blue-300 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400
+                                            file:bg-transparent file:border-0
+                                            file:bg-gray-100 file:mr-4
+                                            file:py-3 file:px-4
+                                            dark:file:bg-gray-700 dark:file:text-gray-400"
+                                onChange={(event) => {
+                                    setCsvFile(event.target.files[0])
+                                    battlecards.onChange(event)
+                                }}
+                            />
                         </div>
-
-                        <button
-                            type="submit"
-                            className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
-                            disabled={!isValid || isSubmitting}>
-                            Save
-                        </button>
+                        <FormErrorMessage error={errors?.battlecards} />
                     </div>
+
+                    <button
+                        type="submit"
+                        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                        disabled={!isValid || isSubmitting}>
+                        Save
+                    </button>
                 </form>
             </div>
         </>

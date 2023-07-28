@@ -10,28 +10,8 @@ import { useAuth } from "~providers/AuthProvider"
 
 import { httpRequest } from "~core/httpRequest"
 import { useAlert } from "~providers/AlertProvider"
-import { FormErrorMessage } from "./FormsError"
-
-const emailManagementFormSchema = z.object({
-    emails: z
-        .array(
-            z.object({
-                email: z
-                    .string()
-                    .email({ message: "Email is not formated correctly" })
-                    .nonempty({ message: "Email is required" })
-            })
-        )
-        .refine(
-            (items) => {
-                const emails = items.map((item) => item.email)
-                return new Set(emails).size === emails.length
-            },
-            {
-                message: "Must be an array of unique strings"
-            }
-        )
-})
+import { emailManagementFormSchema } from "~validation/emailManagementForm.schema"
+import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 
 type EmailManagementForm = z.infer<typeof emailManagementFormSchema>
 
@@ -49,8 +29,8 @@ function EmailManagement() {
         getValues,
         formState: { isValid, isSubmitting, errors }
     } = useForm<EmailManagementForm>({
-        mode: "onBlur",
-        reValidateMode: "onBlur",
+        mode: "onChange",
+        reValidateMode: "onChange",
         resolver: zodResolver(emailManagementFormSchema),
         defaultValues: {
             emails: [{ email: undefined }]
@@ -130,14 +110,22 @@ function EmailManagement() {
                             {fields.map((item, index) => (
                                 <div key={`${item.email}:${index}`}>
                                     <div className="w-full flex flex-row space-x-2">
-                                        <input
-                                            type="text"
-                                            {...register(
-                                                `emails.${index}.email`
-                                            )}
-                                            placeholder="my-user@email.com"
-                                            className="py-3 px-4 w-4/5 border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700"
-                                        />
+                                        <div className="relative w-4/5">
+                                            <input
+                                                type="text"
+                                                {...register(
+                                                    `emails.${index}.email`
+                                                )}
+                                                placeholder="my-user@email.com"
+                                                className="py-3 px-4 w-full border-gray-200 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700"
+                                            />
+                                            <FormErrorIcon
+                                                error={
+                                                    errors.emails?.[index]
+                                                        ?.email
+                                                }
+                                            />
+                                        </div>
                                         <button
                                             type="button"
                                             onClick={() =>
@@ -148,9 +136,7 @@ function EmailManagement() {
                                         </button>
                                     </div>
                                     <FormErrorMessage
-                                        {...{
-                                            error: errors.emails?.[index]?.email
-                                        }}
+                                        error={errors.emails?.[index]?.email}
                                     />
                                 </div>
                             ))}
@@ -165,8 +151,8 @@ function EmailManagement() {
                 </button>
                 <button
                     type="submit"
-                    disabled={!isValid || isSubmitting}
-                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-300 text-white hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-300 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800">
+                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
+                    disabled={!isValid || isSubmitting}>
                     Save
                 </button>
             </form>
