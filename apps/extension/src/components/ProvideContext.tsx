@@ -5,13 +5,14 @@ import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
 import { type z } from "zod"
 
+import { httpRequest } from "~core/httpRequest"
+import { useAlert } from "~providers/AlertProvider"
 import { useAuth } from "~providers/AuthProvider"
 import type BusinessContext from "~types/businessContext.model"
 import type Organization from "~types/organization.model"
 import { businessContextFormSchema } from "~validation/businessContextForm.schema"
 
-import { httpRequest } from "~core/httpRequest"
-import { useAlert } from "~providers/AlertProvider"
+import ErrorAlert from "./ErrorAlert"
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 import Info from "./Info"
 import Warning from "./Warning"
@@ -24,8 +25,8 @@ function ProvideContext() {
         useState<BusinessContext>(null)
 
     const { userSession } = useAuth()
-    const { showErrorMessage, showSuccessMessage, hideErrorMessages } =
-        useAlert()
+    const { showSuccessMessage, hideErrorMessages } = useAlert()
+    const [showErrorUploadingFile, setShowErrorUploadingFile] = useState(false)
     const navigate = useNavigate()
 
     const {
@@ -44,13 +45,14 @@ function ProvideContext() {
 
     const onSubmit = async (form: BusinessContextForm) => {
         await hideErrorMessages()
+        setShowErrorUploadingFile(false)
         const organization = userSession.user.organization
         const businessContextPromise = saveBusinessContext(organization, form)
         const painpointsPromise = savePainpoints(organization)
         try {
             await Promise.all([painpointsPromise, businessContextPromise])
         } catch (error) {
-            await showErrorMessage(error.response.data.code)
+            setShowErrorUploadingFile(true)
             return
         }
         await showSuccessMessage("Business context saved with success.")
@@ -123,7 +125,7 @@ function ProvideContext() {
             setBusinessContext(businessContexts[0])
             reset(businessContexts[0])
         } catch (error) {
-            await showErrorMessage(error.response.data.code)
+            setShowErrorUploadingFile(true)
         }
     }
 
@@ -251,7 +253,9 @@ function ProvideContext() {
                         </div>
                         <FormErrorMessage error={errors?.battlecards} />
                     </div>
-
+                    {showErrorUploadingFile && (
+                        <ErrorAlert>Error when uploading painpoints</ErrorAlert>
+                    )}
                     <button
                         type="submit"
                         className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-klosio-blue-500 text-white disabled:cursor-not-allowed disabled:bg-klosio-blue-300 hover:bg-klosio-blue-600 focus:outline-none focus:ring-2 focus:ring-klosio-blue-500 focus:ring-offset-2 transition-all text-sm dark:focus:ring-offset-gray-800"
