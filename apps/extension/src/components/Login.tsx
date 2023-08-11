@@ -3,15 +3,15 @@ import { useForm, type SubmitHandler } from "react-hook-form"
 import { Link } from "react-router-dom"
 import { z } from "zod"
 
+import { httpRequest } from "~core/httpRequest"
 import { supabase } from "~core/supabase"
+import { useAlert } from "~providers/AlertProvider"
 import { useAuth } from "~providers/AuthProvider"
+import type { ErrorCode } from "~types/errorCode.model"
 import type User from "~types/user.model"
 import type UserSession from "~types/userSession.model"
-
-import { httpRequest } from "~core/httpRequest"
-import { useAlert } from "~providers/AlertProvider"
-import type { ErrorCode } from "~types/errorCode.model"
 import { loginFormSchema } from "~validation/loginForm.schema"
+
 import { FormErrorIcon, FormErrorMessage } from "./FormsError"
 
 interface EmailLoginResponse {
@@ -173,7 +173,12 @@ function Login() {
                             </label>
                             <a
                                 className="text-sm text-klosio-blue-600 decoration-2 hover:underline font-medium"
-                                href="../examples/html/recover-account.html">
+                                href="../examples/html/recover-account.html"
+                                onClick={() =>
+                                    alert(
+                                        "Please contact mochenard@gmail.com to reset your password."
+                                    )
+                                }>
                                 Forgot password?
                             </a>
                         </div>
