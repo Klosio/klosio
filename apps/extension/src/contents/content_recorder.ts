@@ -105,7 +105,7 @@ async function getBattlecardAnalysis(
     formData.append("file", file)
     const battlecard: BattlecardResponse = await httpRequest
         .post(
-            `/v1/analysis/${language}/${userSession.user.organization.id}`,
+            `/v1/save/${language}/${userSession.user.organization.id}`,
             formData,
             {
                 headers: {
